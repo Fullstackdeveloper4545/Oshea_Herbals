@@ -1,0 +1,536 @@
+{%- liquid
+  assign phone = section.settings.phone
+  assign email = section.settings.email
+  assign address = section.settings.address
+  assign customer_service_text = section.settings.customer_service_text
+  assign brand_description = section.settings.brand_description
+  assign made_in_text = section.settings.made_in_text | default: 'Made In India'
+  assign logo = section.settings.brand_logo
+  assign current_year = 'now' | date: '%Y'
+  assign copyright_text = section.settings.copyright_text
+  assign terms_url = section.settings.terms_url
+  assign privacy_url = section.settings.privacy_url
+-%}
+
+<footer id="footer-main-{{ section.id }}" class="footer-main">
+  <div class="footer-main__inner page-width">
+    <div class="footer-main__top">
+      <div class="footer-main__top-item">
+        <div class="footer-main__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm0 2v10h16V7H4Zm2 2h8v2H6V9Zm0 4h6v2H6v-2Z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="footer-main__label">{{ 'Customer Service' }}</div>
+          <div class="footer-main__text">{{ customer_service_text }}</div>
+        </div>
+      </div>
+      <div class="footer-main__top-item">
+        <div class="footer-main__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M6.6 10.8c1.1 2.2 2.9 4 5.1 5.1l1.7-1.7a1 1 0 0 1 1.1-.2c1.2.5 2.6.8 3.9.8a1 1 0 0 1 1 1v2.7a1 1 0 0 1-1 1A16.5 16.5 0 0 1 2 5a1 1 0 0 1 1-1h2.7a1 1 0 0 1 1 1c0 1.3.3 2.7.8 3.9a1 1 0 0 1-.2 1.1L6.6 10.8Z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="footer-main__label">{{ 'Call Us' }}</div>
+          <div class="footer-main__text">{{ phone }}</div>
+        </div>
+      </div>
+      <div class="footer-main__top-item">
+        <div class="footer-main__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M20 5H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1Zm-1 3.2-6.7 4.2a1 1 0 0 1-1.1 0L4.5 8.2V7l7 4.4L19.5 7v1.2Z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="footer-main__label">{{ 'Get in Touch' }}</div>
+          <div class="footer-main__text">{{ email }}</div>
+        </div>
+      </div>
+      <div class="footer-main__top-item">
+        <div class="footer-main__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M12 2a6 6 0 0 0-6 6c0 4.5 6 12 6 12s6-7.5 6-12a6 6 0 0 0-6-6Zm0 8.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="footer-main__label">{{ 'Address' }}</div>
+          <div class="footer-main__text">{{ address }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-main__divider"></div>
+
+    <div class="footer-main__middle">
+      <div class="footer-main__brand">
+        <div class="footer-main__logo-wrap">
+          {% if logo != blank %}
+            {{ logo | image_url: width: 260 | image_tag: class: 'footer-main__logo', loading: 'lazy', alt: section.settings.brand_logo_alt | default: shop.name | escape }}
+          {% else %}
+            {%- assign default_logo = 'oshea-logo.png' | asset_url -%}
+            {% if default_logo != blank %}
+              <img src="{{ default_logo }}" class="footer-main__logo" loading="lazy" alt="{{ section.settings.brand_logo_alt | default: shop.name | escape }}">
+            {% endif %}
+          {% endif %}
+        </div>
+        {% if brand_description != blank %}
+          <p class="footer-main__description">{{ brand_description }}</p>
+        {% endif %}
+        {% if made_in_text != blank %}
+          <p class="footer-main__made-in-btn">
+            <span aria-hidden="true">🌿</span>
+            <span class="footer-main__made-in-label">{{ made_in_text }}</span>
+            <span aria-hidden="true">🌿</span>
+          </p>
+        {% endif %}
+      </div>
+
+      <div class="footer-main__links">
+        <div class="footer-main__column">
+          <h3 class="footer-main__heading">{{ section.settings.shop_heading }}</h3>
+          {% if section.settings.shop_menu != blank %}
+            <ul class="footer-main__list" role="list">
+              {% for link in linklists[section.settings.shop_menu].links %}
+                <li><a href="{{ link.url }}" class="footer-main__link">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <ul class="footer-main__list" role="list">
+              <li><span class="footer-main__link">Shop By Range</span></li>
+              <li><span class="footer-main__link">PhytoDerma</span></li>
+              <li><span class="footer-main__link">Skin Care</span></li>
+              <li><span class="footer-main__link">Hair Care</span></li>
+              <li><span class="footer-main__link">Bath &amp; Body</span></li>
+              <li><span class="footer-main__link">Color Essentials</span></li>
+              <li><span class="footer-main__link">Facial Kit</span></li>
+              <li><span class="footer-main__link">Buy any 2 @599</span></li>
+              <li><span class="footer-main__link">2 Perfumes@1299</span></li>
+              <li><span class="footer-main__link">Combos@20% OFF</span></li>
+              <li><span class="footer-main__link">Edits</span></li>
+            </ul>
+          {% endif %}
+        </div>
+
+        <div class="footer-main__column">
+          <h3 class="footer-main__heading">{{ section.settings.company_heading }}</h3>
+          {% if section.settings.company_menu != blank %}
+            <ul class="footer-main__list" role="list">
+              {% for link in linklists[section.settings.company_menu].links %}
+                <li><a href="{{ link.url }}" class="footer-main__link">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <ul class="footer-main__list" role="list">
+              <li><span class="footer-main__link">Home</span></li>
+              <li><span class="footer-main__link">About Us</span></li>
+              <li><span class="footer-main__link">Contact Us</span></li>
+              <li><span class="footer-main__link">Our Blogs</span></li>
+              <li><span class="footer-main__link">MGT7</span></li>
+            </ul>
+          {% endif %}
+        </div>
+
+        <div class="footer-main__column">
+          <h3 class="footer-main__heading">{{ section.settings.support_heading }}</h3>
+          {% if section.settings.support_menu != blank %}
+            <ul class="footer-main__list" role="list">
+              {% for link in linklists[section.settings.support_menu].links %}
+                <li><a href="{{ link.url }}" class="footer-main__link">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <ul class="footer-main__list" role="list">
+              <li><span class="footer-main__link">Privacy Policy</span></li>
+              <li><span class="footer-main__link">Refund Policy</span></li>
+              <li><span class="footer-main__link">Terms &amp; Conditions</span></li>
+              <li><span class="footer-main__link">HTML Sitemap</span></li>
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-main__divider footer-main__divider--lower"></div>
+
+    <div class="footer-main__bottom">
+      <div class="footer-main__social-legal">
+        <div class="footer-main__social">
+          {% if section.settings.social_facebook != blank %}
+            <a href="{{ section.settings.social_facebook }}" class="footer-main__social-link" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" role="presentation"><path d="M13 10h2.5l.5-3H13V5.5c0-.9.3-1.5 1.6-1.5H16V1.1C15.4 1 14.1 1 12.6 1 9.9 1 8 2.7 8 5.2V7H5v3h3v9h4v-9Z"/></svg>
+            </a>
+          {% endif %}
+          {% if section.settings.social_instagram != blank %}
+            <a href="{{ section.settings.social_instagram }}" class="footer-main__social-link" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" role="presentation"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5Zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5Zm5.75-3.5a1.25 1.25 0 1 1-1.25 1.25 1.25 1.25 0 0 1 1.25-1.25Z"/></svg>
+            </a>
+          {% endif %}
+          {% if section.settings.social_youtube != blank %}
+            <a href="{{ section.settings.social_youtube }}" class="footer-main__social-link" aria-label="YouTube">
+              <svg viewBox="0 0 24 24" role="presentation"><path d="M21.6 7.2s-.2-1.4-.8-2a2.8 2.8 0 0 0-2-.8C16.1 4.2 12 4.2 12 4.2h-.1s-4 0-6.8.2a2.8 2.8 0 0 0-2 .8c-.6.6-.8 2-.8 2S2 8.8 2 10.3v1.4c0 1.5.2 3 .2 3s.2 1.4.8 2a2.8 2.8 0 0 0 2 .8c1.4.1 6 .2 6 .2s4 0 6.8-.2a2.8 2.8 0 0 0 2-.8c.6-.6.8-2 .8-2s.2-1.5.2-3v-1.4c0-1.5-.2-3-.2-3ZM9.8 13.8V8.8l4.9 2.5-4.9 2.5Z"/></svg>
+            </a>
+          {% endif %}
+        </div>
+        <div class="footer-main__legal">
+          {% if terms_url != blank %}
+            <a class="footer-main__legal-link" href="{{ terms_url }}">Terms &amp; Conditions</a>
+          {% endif %}
+          {% if privacy_url != blank %}
+            <a class="footer-main__legal-link" href="{{ privacy_url }}">Privacy Policy</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  #footer-main-{{ section.id }} {
+    background: #fff;
+    border-top: 1px solid #e5e5e5;
+    color: #1b1b1b;
+  }
+  #footer-main-{{ section.id }} .footer-main__inner {\n    padding: 48px 24px 36px;\n    max-width: 1200px;\n    margin-left: auto;\n    margin-right: auto;\n  }
+  #footer-main-{{ section.id }} .footer-main__top {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+    align-items: start;
+  }
+  #footer-main-{{ section.id }} .footer-main__top-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+  #footer-main-{{ section.id }} .footer-main__icon {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1b1b1b;
+  }
+  #footer-main-{{ section.id }} .footer-main__icon svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+  #footer-main-{{ section.id }} .footer-main__label {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  #footer-main-{{ section.id }} .footer-main__text {
+    color: #3d3d3d;
+    font-size: 0.95rem;
+  }
+  #footer-main-{{ section.id }} .footer-main__divider {
+    border-top: 1px solid #e5e5e5;
+    margin: 32px 0 40px;
+  }
+  #footer-main-{{ section.id }} .footer-main__middle {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px;
+    margin-top: 8px;
+  }
+  #footer-main-{{ section.id }} .footer-main__brand {
+    display: grid;
+    gap: 8px;
+  }
+  #footer-main-{{ section.id }} .footer-main__logo-wrap {
+    display: inline-block;
+    margin-bottom: 2px;
+  }
+  #footer-main-{{ section.id }} .footer-main__logo {
+    max-width: 240px;
+    height: auto;
+  }
+  #footer-main-{{ section.id }} .footer-main__description {
+    margin: 0;
+    color: #3d3d3d;
+    line-height: 1.5;
+    font-size: 0.95rem;
+  }
+  #footer-main-{{ section.id }} .footer-main__made-in-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #0a6b3d;
+    font-weight: 600;
+    font-size: 0.95rem;
+    font-style: italic;
+    text-decoration: none;
+    box-shadow: none;
+    margin-top: 4px;
+  }
+  #footer-main-{{ section.id }} .footer-main__made-in-btn:hover {
+    color: #064729;
+    text-decoration: underline;
+  }
+  #footer-main-{{ section.id }} .footer-main__links {
+    grid-column: span 3;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+  }
+  #footer-main-{{ section.id }} .footer-main__heading {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+  #footer-main-{{ section.id }} .footer-main__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 8px;
+  }
+  #footer-main-{{ section.id }} .footer-main__link {
+    color: #2f2f2f;
+    text-decoration: none;
+    font-size: 0.96rem;
+  }
+  #footer-main-{{ section.id }} .footer-main__link:hover {
+    color: #0a6b3d;
+    text-decoration: underline;
+  }
+  #footer-main-{{ section.id }} .footer-main__divider--lower {
+    margin-top: 32px;
+    margin-bottom: 18px;
+  }
+  #footer-main-{{ section.id }} .footer-main__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  #footer-main-{{ section.id }} .footer-main__social-legal {
+    display: flex;
+    flex-direction: row;
+    gap: 18px;
+    align-items: center;
+    text-align: right;
+  }
+  #footer-main-{{ section.id }} .footer-main__social {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  #footer-main-{{ section.id }} .footer-main__social-link {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #d7d7d7;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1b1b1b;
+    background: #fff;
+    text-decoration: none;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
+  #footer-main-{{ section.id }} .footer-main__social-link:hover {
+    background: #0a6b3d;
+    color: #fff;
+    border-color: #0a6b3d;
+  }
+  #footer-main-{{ section.id }} .footer-main__social-link svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+  #footer-main-{{ section.id }} .footer-main__legal {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  #footer-main-{{ section.id }} .footer-main__legal-link {
+    color: #0a6b3d;
+    text-decoration: none;
+    font-size: 0.96rem;
+    font-weight: 500;
+  }
+  #footer-main-{{ section.id }} .footer-main__legal-link:hover {
+    text-decoration: underline;
+  }
+  @media (max-width: 989px) {
+    #footer-main-{{ section.id }} .footer-main__top {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    #footer-main-{{ section.id }} .footer-main__middle {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    #footer-main-{{ section.id }} .footer-main__links {
+      grid-column: span 2;
+    }
+  }
+  @media (max-width: 749px) {
+    #footer-main-{{ section.id }} .footer-main__inner {
+      padding: 36px 16px 24px;
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #footer-main-{{ section.id }} .footer-main__top {
+      grid-template-columns: 1fr;
+    }
+    #footer-main-{{ section.id }} .footer-main__middle {
+      grid-template-columns: 1fr;
+    }
+    #footer-main-{{ section.id }} .footer-main__links {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-column: span 1;
+    }
+    #footer-main-{{ section.id }} .footer-main__bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    #footer-main-{{ section.id }} .footer-main__social-legal {
+      flex-direction: column;
+      align-items: flex-start;
+      justify-items: flex-start;
+      gap: 10px;
+    }
+    #footer-main-{{ section.id }} .footer-main__legal {
+      justify-content: flex-start;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "We're on Gram Footer",
+  "tag": "footer",
+  "settings": [
+    {
+      "type": "text",
+      "id": "customer_service_text",
+      "label": "Customer service text",
+      "default": "Mon–Sat, 9am–6pm EST."
+    },
+    {
+      "type": "text",
+      "id": "phone",
+      "label": "Phone number",
+      "default": "+91 33 4043 3333"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email",
+      "default": "care@osheaherbal.com"
+    },
+    {
+      "type": "text",
+      "id": "address",
+      "label": "Address",
+      "default": "Salt Lake City, Kolkata 700091"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo",
+      "label": "Brand logo"
+    },
+    {
+      "type": "text",
+      "id": "brand_logo_alt",
+      "label": "Brand logo alt text"
+    },
+    {
+      "type": "textarea",
+      "id": "brand_description",
+      "label": "Brand description",
+      "default": "Oshea Herbals blends nature and science to create transparent, effective, and affordable skincare made with globally sourced ingredients for every skin type."
+    },
+    {
+      "type": "text",
+      "id": "made_in_text",
+      "label": "Made in text",
+      "default": "Made in India"
+    },
+    {
+      "type": "text",
+      "id": "shop_heading",
+      "label": "Shop heading",
+      "default": "Shop"
+    },
+    {
+      "type": "link_list",
+      "id": "shop_menu",
+      "label": "Shop menu"
+    },
+    {
+      "type": "text",
+      "id": "company_heading",
+      "label": "Company heading",
+      "default": "Company"
+    },
+    {
+      "type": "link_list",
+      "id": "company_menu",
+      "label": "Company menu"
+    },
+    {
+      "type": "text",
+      "id": "support_heading",
+      "label": "Support heading",
+      "default": "Support"
+    },
+    {
+      "type": "link_list",
+      "id": "support_menu",
+      "label": "Support menu"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "default": "© 2025 Oshea Herbals. Powered by Shopify"
+    },
+    {
+      "type": "url",
+      "id": "terms_url",
+      "label": "Terms & Conditions URL"
+    },
+    {
+      "type": "url",
+      "id": "privacy_url",
+      "label": "Privacy Policy URL"
+    },
+    {
+      "type": "url",
+      "id": "social_facebook",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "social_instagram",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "social_youtube",
+      "label": "YouTube URL"
+    }
+  ],
+  "blocks": [],
+  "presets": [
+    {
+      "name": "Footer main"
+    }
+  ]
+}
+{% endschema %}
+
+

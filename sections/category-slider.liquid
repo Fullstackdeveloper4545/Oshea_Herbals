@@ -1,0 +1,126 @@
+{% assign section_id = section.id %}
+<section id="category-slider-{{ section_id }}" class="category-slider-section">
+  <div class="cs-inner">
+    <h2 class="cs-title">Shop by Category</h2>
+    <div class="cs-title-underline"></div>
+    <div class="cs-slider-controls">
+      <button class="cs-arrow cs-arrow-left" aria-label="Previous categories">&#8592;</button>
+      <button class="cs-arrow cs-arrow-right" aria-label="Next categories">&#8594;</button>
+    </div>
+    <div class="cs-slider-content">
+      <div class="cs-slider-track">
+        {% for block in section.blocks %}
+          <div class="cs-slider-item">
+            <a href="{{ block.settings.link }}" class="cs-card">
+              <div class="cs-image-wrap">
+                {% if block.settings.image != blank %}
+                  <img src="{{ block.settings.image | img_url: '300x300' }}" alt="{{ block.settings.title }}" loading="lazy" />
+                  <span class="cs-arrow-indicator">&#10148;</span>
+                {% else %}
+                  <div class="cs-image-placeholder"></div>
+                {% endif %}
+              </div>
+              <div class="cs-category-name">{{ block.settings.title }}</div>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <style>
+    :root { --cs-green: #1ea64a; --cs-dark: #0b2f1b; }
+    .category-slider-section { padding: 36px 16px 0 16px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color: var(--cs-dark); }
+    .cs-inner { max-width: 1300px; margin: 0 auto; position: relative; }
+    .cs-title { font-size: 26px; font-weight: 700; margin-bottom: 0; text-align: left; }
+    .cs-title-underline { width: 180px; height: 4px; background: var(--cs-green); border-radius: 2px; margin: 8px 0 24px 0; }
+    .cs-slider-controls { position: absolute; right: 12px; top: 0; display: flex; gap: 8px; }
+    .cs-arrow { background: #fff; border: 1px solid #e6e6e6; width: 40px; height: 40px; border-radius: 20px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07); transition: background 0.2s; }
+    .cs-arrow:hover { background: #f3f3f3; }
+    .cs-slider-content { overflow: hidden; position: relative; }
+    .cs-slider-track { display: flex; align-items: stretch; transition: transform 500ms cubic-bezier(.22,.9,.35,1); will-change: transform; }
+    .cs-slider-item { box-sizing: border-box; padding: 12px; }
+    .cs-card { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit; }
+    .cs-image-wrap { background: #fff; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 120px; width: 120px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); position: relative; transition: transform 300ms ease; }
+    .cs-image-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; transition: transform 0.3s; }
+    .cs-card:hover .cs-image-wrap img { transform: scale(1.08); }
+    .cs-card:hover .cs-arrow-indicator { opacity: 1; transform: translateX(10px); }
+    .cs-arrow-indicator { position: absolute; right: 12px; top: 50%; transform: translateY(-50%) translateX(0); font-size: 28px; color: var(--cs-green); opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; }
+    .cs-category-name { font-weight: 700; font-size: 15px; margin-top: 14px; text-align: center; }
+    .cs-image-placeholder { width: 100px; height: 100px; background: #e6e6e6; border-radius: 50%; }
+    @media (min-width:1200px) { .cs-slider-item { width: calc(100% / {{ section.settings.items_per_row | default: 7 }}); } }
+    @media (min-width:992px) and (max-width:1199px) { .cs-slider-item { width: calc(100% / 5); } }
+    @media (min-width:768px) and (max-width:991px) { .cs-slider-item { width: calc(100% / 3); } }
+    @media (min-width:480px) and (max-width:767px) { .cs-slider-item { width: calc(100% / 2); } }
+    @media (max-width:479px) { .cs-slider-item { width:100%; } }
+  </style>
+
+  <script>
+    (function(){
+      var root = document.getElementById('category-slider-{{ section_id }}');
+      if (!root) return;
+      var track = root.querySelector('.cs-slider-track');
+      var items = Array.prototype.slice.call(track.querySelectorAll('.cs-slider-item'));
+      var leftBtn = root.querySelector('.cs-arrow-left');
+      var rightBtn = root.querySelector('.cs-arrow-right');
+      var perView = parseInt({{ section.settings.items_per_row | default: 7 }});
+      var total = items.length;
+      var index = perView;
+      function computeItemsPerView(){
+        var w = window.innerWidth;
+        if (w >= 1200) return perView;
+        if (w >= 992) return 5;
+        if (w >= 768) return 3;
+        if (w >= 480) return 2;
+        return 1;
+      }
+      function setFlex(){
+        var pv = computeItemsPerView();
+        items.forEach(function(it){ it.style.flex = '0 0 ' + (100 / pv) + '%'; });
+      }
+      function cloneItems(){
+        Array.from(track.querySelectorAll('.cs-slider-item[data-clone]')).forEach(function(n){ n.parentNode.removeChild(n); });
+        for (var i=0;i<perView && i<total;i++){
+          var clone = items[i].cloneNode(true); clone.setAttribute('data-clone','after'); track.appendChild(clone); }
+        for (i=total-1;i>=0 && (total -1 - i) < perView;i--){ var clone2 = items[i].cloneNode(true); clone2.setAttribute('data-clone','before'); track.insertBefore(clone2, track.firstChild); }
+      }
+      function updatePos(animate){ track.style.transition = animate ? '' : 'none'; track.style.transform = 'translateX(' + (- (index * (100 / computeItemsPerView()))) + '%)'; }
+      function next(){ index++; updatePos(true); }
+      function prev(){ index--; updatePos(true); }
+      track.addEventListener('transitionend', function(){ if (index >= total + perView){ index = perView; updatePos(false); } if (index < perView){ index = total + (index); updatePos(false); } });
+      leftBtn.addEventListener('click', prev);
+      rightBtn.addEventListener('click', next);
+      // Touch support
+      var startX = 0, currentX = 0, isDown = false, moved = false;
+      track.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; isDown = true; track.style.transition = 'none'; });
+      track.addEventListener('touchmove', function(e){ if (!isDown) return; currentX = e.touches[0].clientX; var dx = currentX - startX; var pct = dx / root.querySelector('.cs-slider-content').clientWidth * 100; track.style.transform = 'translateX(' + ( - (index * (100 / computeItemsPerView())) + pct ) + '%)'; moved = true; });
+      track.addEventListener('touchend', function(e){ if (!isDown) return; isDown = false; if (!moved){ return; } var dx = currentX - startX; if (dx < -40) { next(); } else if (dx > 40) { prev(); } else { updatePos(true); } moved = false; });
+      // Responsive
+      function reinit(){ perView = computeItemsPerView(); setFlex(); cloneItems(); updatePos(false); }
+      window.addEventListener('resize', function(){ reinit(); });
+      // Initial setup
+      setFlex(); cloneItems(); updatePos(false);
+    })();
+  </script>
+
+  {% schema %}
+  {
+    "name": "Category Slider",
+    "settings": [
+      {"type": "number", "id": "items_per_row", "label": "Items per row", "default": 7}
+    ],
+    "blocks": [
+      {
+        "type": "category",
+        "name": "Category Item",
+        "settings": [
+          {"type": "image_picker", "id": "image", "label": "Category Image"},
+          {"type": "text", "id": "title", "label": "Category Title"},
+          {"type": "url", "id": "link", "label": "Link to Collection or Page"}
+        ]
+      }
+    ],
+    "presets": [{"name": "Category Slider", "category": "Collection"}]
+  }
+  {% endschema %}
+</section>

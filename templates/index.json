@@ -1,0 +1,68 @@
+{
+  "sections": {
+    "brand-assurance": { "type": "brand-assurance", "settings": {} },
+    "featured-products": { "type": "featured-products", "settings": {} },
+    "category_circle_slider": { "type": "category-circle-slider", "settings": {} },
+    "shop_by_concern": { "type": "shop-by-concern", "settings": {} },
+    "pill_category_strip": { "type": "pill-category-strip", "settings": {} },
+    "shop_by_skin_type": { "type": "shop-by-skin-type", "settings": {} },
+    "trending_this_week": { "type": "trending-this-week", "settings": {} },
+    "shop_by_benefits": { "type": "shop-by-benefits", "settings": {} },
+    "must_have_combos": { "type": "must-have-combos", "settings": {} },
+    "shop_by_ingredients": { "type": "shop-by-ingredients", "settings": {} },
+    "customer_reviews": { "type": "customer-reviews-slider", "settings": {} },
+    "watch_love_shop": { "type": "watch-love-shop", "settings": {} },
+    "our-blog-posts": { "type": "our-blog-posts", "settings": {} },
+    "also-shop-at": {
+      "type": "also-shop-at",
+      "settings": {},
+      "blocks": {
+        "logo_1": { "type": "logo_item", "settings": { "image": null, "link": "", "alt_text": "" } },
+        "logo_2": { "type": "logo_item", "settings": { "image": null, "link": "", "alt_text": "" } },
+        "logo_3": { "type": "logo_item", "settings": { "image": null, "link": "", "alt_text": "" } },
+        "logo_4": { "type": "logo_item", "settings": { "image": null, "link": "", "alt_text": "" } }
+      },
+      "block_order": ["logo_1", "logo_2", "logo_3", "logo_4"]
+    },
+    "we_are_on_gram": {
+      "type": "we-are-on-gram",
+      "settings": {},
+      "blocks": {
+        "media_1": { "type": "media_item", "settings": { "image": null, "video_url": "", "link": "" } },
+        "media_2": { "type": "media_item", "settings": { "image": null, "video_url": "", "link": "" } },
+        "media_3": { "type": "media_item", "settings": { "image": null, "video_url": "", "link": "" } },
+        "media_4": { "type": "media_item", "settings": { "image": null, "video_url": "", "link": "" } },
+        "media_5": { "type": "media_item", "settings": { "image": null, "video_url": "", "link": "" } },
+        "media_6": { "type": "media_item", "settings": { "image": null, "video_url": "", "link": "" } }
+      },
+      "block_order": ["media_1", "media_2", "media_3", "media_4", "media_5", "media_6"]
+    },
+    "footer_main": {
+      "type": "footer-main",
+      "settings": {}
+    },
+    "footer_bottom_strip": {
+      "type": "footer-bottom-strip",
+      "settings": {}
+    }
+  },
+  "order": [
+    "brand-assurance",
+    "featured-products",
+    "category_circle_slider",
+    "shop_by_concern",
+    "pill_category_strip",
+    "shop_by_skin_type",
+    "trending_this_week",
+    "shop_by_benefits",
+    "must_have_combos",
+    "shop_by_ingredients",
+    "customer_reviews",
+    "watch_love_shop",
+    "our-blog-posts",
+    "also-shop-at",
+    "we_are_on_gram",
+    "footer_main",
+    "footer_bottom_strip"
+  ]
+}

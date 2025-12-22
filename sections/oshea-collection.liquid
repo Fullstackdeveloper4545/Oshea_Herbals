@@ -1,0 +1,465 @@
+{%- assign current_view = request.params.view | default: 'grid' -%}
+
+<style>
+  .ocp {
+    background: #fff;
+    color: #0f2413;
+    padding: 28px 0 40px;
+  }
+  .ocp .page-width { max-width: 1200px; }
+  .ocp__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .ocp__title { font-size: 28px; font-weight: 800; margin: 0; }
+  .ocp__count { font-weight: 700; color: #193b24; }
+  .ocp__controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .ocp__sort {
+    border: 1px solid #dbe7df;
+    border-radius: 10px;
+    padding: 8px 10px;
+    min-width: 180px;
+  }
+  .ocp__view-toggle button {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #dbe7df;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .ocp__view-toggle button.is-active {
+    background: #0f5c2e;
+    color: #fff;
+    border-color: #0f5c2e;
+  }
+  .ocp__layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 18px;
+  }
+  .ocp__filters {
+    border: 1px solid #e5ece7;
+    border-radius: 14px;
+    padding: 14px;
+    background: #f8fbf9;
+  }
+  .ocp-filter + .ocp-filter { margin-top: 12px; }
+  .ocp-filter__title { font-weight: 800; margin: 0 0 8px; }
+  .ocp-filter__list { display: grid; gap: 8px; }
+  .ocp-filter__item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .ocp-filter__range {
+    display: grid;
+    gap: 10px;
+  }
+  .ocp-filter__range input[type="range"] { width: 100%; }
+  .ocp-filter__range .ocp-filter__nums { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .ocp-filter__range input[type="number"] {
+    width: 100%;
+    border: 1px solid #dbe7df;
+    border-radius: 8px;
+    padding: 6px 8px;
+  }
+  .ocp__results { display: grid; gap: 14px; }
+  .ocp__grid {
+    display: grid;
+    gap: 14px;
+  }
+  .ocp__grid[data-view="grid"] {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+  .ocp__grid[data-view="list"] {
+    grid-template-columns: 1fr;
+  }
+  .ocp-card {
+    border: 1px solid #e7e7e7;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    position: relative;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .ocp__grid[data-view="list"] .ocp-card {
+    grid-template-columns: 160px 1fr;
+    grid-template-rows: auto;
+    align-items: stretch;
+  }
+  .ocp-card:hover { box-shadow: 0 14px 34px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .ocp-card__badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #0f5c2e;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+  .ocp-card__media img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    display: block;
+  }
+  .ocp__grid[data-view="list"] .ocp-card__media img { height: 100%; }
+  .ocp-card__body {
+    padding: 12px;
+    display: grid;
+    gap: 6px;
+    align-content: space-between;
+  }
+  .ocp-card__title { font-weight: 800; margin: 0; color: #0f2413; font-size: 1rem; }
+  .ocp-card__price { font-weight: 800; color: #0a3c20; }
+  .ocp-card__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #0f5c2e;
+    background: #0f5c2e;
+    color: #fff;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .ocp-card__cta:hover { background: #0c4a24; }
+  .ocp__pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    align-items: center;
+  }
+  .ocp__pagination a, .ocp__pagination span {
+    padding: 8px 12px;
+    border: 1px solid #dbe7df;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #0f2413;
+  }
+  .ocp__about {
+    margin-top: 26px;
+    border: 1px solid #e5ece7;
+    border-radius: 14px;
+    padding: 16px;
+    background: #f7fbf8;
+  }
+  .ocp__about h2 { margin: 0 0 8px; }
+  .ocp__promo {
+    margin-top: 18px;
+    border: 1px solid #e5ece7;
+    border-radius: 14px;
+    padding: 12px 8px;
+    background: #f8fbf9;
+    overflow: hidden;
+  }
+  .ocp__promo .scrolling-promotion { display:flex; gap:24px; align-items:center; }
+  .ocp__promo .promotion { display:flex; gap:24px; min-width:120%; animation: ocpMarquee 26s linear infinite; }
+  .ocp__promo .promotion__text { font-weight:800; white-space: nowrap; color:#0f2413; }
+  @keyframes ocpMarquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @media (max-width: 1024px) {
+    .ocp__layout { grid-template-columns: 1fr; }
+    .ocp__filters { order: 2; }
+  }
+  @media (max-width: 640px) {
+    .ocp__title { font-size: 22px; }
+    .ocp__grid[data-view="grid"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>
+
+<section id="Ocp-{{ section.id }}" class="ocp">
+  <div class="page-width">
+    <header class="ocp__header">
+      <h1 class="ocp__title">{{ collection.title }}</h1>
+      <div class="ocp__controls">
+        <div class="ocp__count" data-ocp-count>{{ collection.products_count }} products</div>
+        <label>
+          <span class="visually-hidden">Sort by</span>
+          <select class="ocp__sort" name="sort_by" form="OcpFilterForm-{{ section.id }}" data-ocp-sort>
+            {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+            <option value="manual" {% if sort_by == 'manual' %}selected{% endif %}>Featured</option>
+            <option value="created-descending" {% if sort_by == 'created-descending' %}selected{% endif %}>Newest</option>
+            <option value="price-ascending" {% if sort_by == 'price-ascending' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price-descending" {% if sort_by == 'price-descending' %}selected{% endif %}>Price: High to Low</option>
+          </select>
+        </label>
+        <div class="ocp__view-toggle" data-ocp-view>
+          <button type="button" data-view="grid" class="{% if current_view == 'grid' %}is-active{% endif %}" aria-label="Grid view">☷</button>
+          <button type="button" data-view="list" class="{% if current_view == 'list' %}is-active{% endif %}" aria-label="List view">☰</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="ocp__layout">
+      <aside class="ocp__filters">
+        <form id="OcpFilterForm-{{ section.id }}" data-ocp-form method="get" action="{{ collection.url }}">
+          <input type="hidden" name="view" value="{{ current_view }}" data-ocp-view-input>
+          <div class="ocp-filter">
+            <p class="ocp-filter__title">Filters</p>
+          </div>
+          {%- for filter in collection.filters -%}
+            <div class="ocp-filter">
+              <p class="ocp-filter__title">{{ filter.label }}</p>
+              {%- case filter.type -%}
+                {%- when 'list' -%}
+                  <div class="ocp-filter__list">
+                    {%- for filter_value in filter.values -%}
+                      <label class="ocp-filter__item">
+                        <input
+                          type="checkbox"
+                          name="{{ filter_value.param_name }}"
+                          value="{{ filter_value.value }}"
+                          {% if filter_value.active %}checked{% endif %}
+                          {% if filter_value.count == 0 and filter_value.active == false %}disabled{% endif %}
+                        >
+                        <span>{{ filter_value.label }} ({{ filter_value.count }})</span>
+                      </label>
+                    {%- endfor -%}
+                  </div>
+                {%- when 'price_range' -%}
+                  <div class="ocp-filter__range">
+                    {%- liquid
+                      assign max = filter.range_max | divided_by: 100.0
+                      assign min_value = filter.min_value.value | default: 0 | divided_by: 100.0
+                      assign max_value = filter.max_value.value | default: max | divided_by: 100.0
+                    -%}
+                    <input type="range" min="0" max="{{ max | ceil }}" value="{{ min_value | ceil }}" data-price-min>
+                    <input type="range" min="0" max="{{ max | ceil }}" value="{{ max_value | ceil }}" data-price-max>
+                    <div class="ocp-filter__nums">
+                      <input name="{{ filter.min_value.param_name }}" type="number" min="0" max="{{ max | ceil }}" value="{{ min_value | ceil }}" placeholder="Min">
+                      <input name="{{ filter.max_value.param_name }}" type="number" min="0" max="{{ max | ceil }}" value="{{ max_value | ceil }}" placeholder="Max">
+                    </div>
+                  </div>
+              {%- endcase -%}
+            </div>
+          {%- endfor -%}
+        </form>
+      </aside>
+
+      <div class="ocp__results">
+        <div class="ocp__grid" data-ocp-grid data-view="{{ current_view }}">
+          {%- paginate collection.products by section.settings.products_per_page -%}
+            {%- for product in collection.products -%}
+              <article class="ocp-card">
+                {%- if product.tags contains 'New' -%}
+                  <span class="ocp-card__badge">New</span>
+                {%- endif -%}
+                <a class="ocp-card__media" href="{{ product.url }}">
+                  {%- if product.featured_image -%}
+                    {{ product.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', alt: product.title }}
+                  {%- else -%}
+                    <div style="height:250px;background:#f3f3f3;"></div>
+                  {%- endif -%}
+                </a>
+                <div class="ocp-card__body">
+                  <div>
+                    <a class="ocp-card__title" href="{{ product.url }}">{{ product.title }}</a>
+                    <div class="ocp-card__price">
+                      {%- render 'price', product: product, price_class: '' -%}
+                    </div>
+                  </div>
+                  <form method="post" action="/cart/add" class="ocp-card__form">
+                    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                    <button type="submit" class="ocp-card__cta"{% unless product.available %} disabled{% endunless %}>
+                      {% if product.available %}Add to Cart{% else %}Sold Out{% endif %}
+                    </button>
+                  </form>
+                </div>
+              </article>
+            {%- endfor -%}
+            {%- if paginate.pages > 1 -%}
+              <nav class="ocp__pagination" data-ocp-pagination>
+                {%- if paginate.previous -%}
+                  <a href="{{ paginate.previous.url }}">&larr;</a>
+                {%- else -%}
+                  <span aria-disabled="true">&larr;</span>
+                {%- endif -%}
+                <span>{{ paginate.current_page }} / {{ paginate.pages }}</span>
+                {%- if paginate.next -%}
+                  <a href="{{ paginate.next.url }}">&rarr;</a>
+                {%- else -%}
+                  <span aria-disabled="true">&rarr;</span>
+                {%- endif -%}
+              </nav>
+            {%- endif -%}
+          {%- endpaginate -%}
+        </div>
+      </div>
+    </div>
+
+    <div class="ocp__about">
+      <h2>{{ section.settings.about_heading | default: 'About ' | append: collection.title }}</h2>
+      <div>
+        {%- if collection.description != blank -%}
+          {{ collection.description }}
+        {%- else -%}
+          {{ section.settings.about_text }}
+        {%- endif -%}
+      </div>
+      <div class="ocp__promo" aria-label="HytoDerma highlights">
+        <scrolling-promotion class="scrolling-promotion scrolling-promotion--left" data-section-type="scrolling-promotion" data-pause-on-hover="">
+          <div class="promotion promotion--animated">
+            <div class="promotion__item promotion__item-text" style="--text-opacity: 1.0;">
+              <div class="block promotion__item-wrap self-center">
+                <div class="promotion__text h4">Affordable</div>
+              </div>
+            </div>
+            <div class="promotion__item promotion__item-text" style="--text-opacity: 1.0;">
+              <div class="block promotion__item-wrap self-center">
+                <div class="promotion__text h4">Proven Results</div>
+              </div>
+            </div>
+            <div class="promotion__item promotion__item-text" style="--text-opacity: 1.0;">
+              <div class="block promotion__item-wrap self-center">
+                <div class="promotion__text h4">Honest Formulations</div>
+              </div>
+            </div>
+            <div class="promotion__item promotion__item-text" style="--text-opacity: 1.0;">
+              <div class="block promotion__item-wrap self-center">
+                <div class="promotion__text h4">Global Standards</div>
+              </div>
+            </div>
+            <div class="promotion__item promotion__item-text" style="--text-opacity: 1.0;">
+              <div class="block promotion__item-wrap self-center">
+                <div class="promotion__text h4">Pure Ingredients</div>
+              </div>
+            </div>
+          </div>
+          <div class="promotion promotion--animated">
+            <div class="promotion__item promotion__item-text" style="--text-opacity: 1.0;">
+              <div class="block promotion__item-wrap self-center">
+                <div class="promotion__text h4">Affordable</div>
+              </div>
+            </div>
+            <div class="promotion__item promotion__item-text" style="--text-opacity: 1.0;">
+              <div class="block promotion__item-wrap self-center">
+                <div class="promotion__text h4">Proven Results</div>
+              </div>
+            </div>
+            <div class="promotion__item promotion__item-text" style="--text-opacity: 1.0;">
+              <div class="block promotion__item-wrap self-center">
+                <div class="promotion__text h4">Honest Formulations</div>
+              </div>
+            </div>
+            <div class="promotion__item promotion__item-text" style="--text-opacity: 1.0;">
+              <div class="block promotion__item-wrap self-center">
+                <div class="promotion__text h4">Global Standards</div>
+              </div>
+            </div>
+            <div class="promotion__item promotion__item-text" style="--text-opacity: 1.0;">
+              <div class="block promotion__item-wrap self-center">
+                <div class="promotion__text h4">Pure Ingredients</div>
+              </div>
+            </div>
+          </div>
+        </scrolling-promotion>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const root = document.getElementById('Ocp-{{ section.id }}');
+    if (!root) return;
+    const form = root.querySelector('[data-ocp-form]');
+    const grid = root.querySelector('[data-ocp-grid]');
+    const countEl = root.querySelector('[data-ocp-count]');
+    const pagination = root.querySelector('[data-ocp-pagination]');
+    const viewInput = root.querySelector('[data-ocp-view-input]');
+    const viewButtons = root.querySelectorAll('[data-ocp-view] button');
+    const sortSelect = root.querySelector('[data-ocp-sort]');
+
+    function updateView(view) {
+      if (!grid) return;
+      grid.dataset.view = view;
+      viewInput.value = view;
+      viewButtons.forEach((btn) => btn.classList.toggle('is-active', btn.dataset.view === view));
+    }
+
+    viewButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        updateView(btn.dataset.view);
+        submitFilters();
+      });
+    });
+
+    sortSelect?.addEventListener('change', submitFilters);
+
+    form.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+      input.addEventListener('change', submitFilters);
+    });
+
+    form.querySelectorAll('input[type="number"]').forEach((input) => {
+      input.addEventListener('change', submitFilters);
+    });
+
+    const priceMin = form.querySelector('[data-price-min]');
+    const priceMax = form.querySelector('[data-price-max]');
+    const minField = form.querySelector('input[name*="price.gte"]');
+    const maxField = form.querySelector('input[name*="price.lte"]');
+    if (priceMin && minField) {
+      priceMin.addEventListener('input', () => { minField.value = priceMin.value; });
+      priceMin.addEventListener('change', submitFilters);
+    }
+    if (priceMax && maxField) {
+      priceMax.addEventListener('input', () => { maxField.value = priceMax.value; });
+      priceMax.addEventListener('change', submitFilters);
+    }
+
+    function buildUrl() {
+      const params = new URLSearchParams(new FormData(form));
+      return `${window.location.pathname}?${params.toString()}&section_id={{ section.id }}`;
+    }
+
+    function submitFilters() {
+      const url = buildUrl();
+      fetch(url)
+        .then((res) => res.text())
+        .then((html) => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const newGrid = doc.querySelector('[data-ocp-grid]');
+          const newCount = doc.querySelector('[data-ocp-count]');
+          const newPagination = doc.querySelector('[data-ocp-pagination]');
+          if (newGrid && grid) grid.innerHTML = newGrid.innerHTML;
+          if (newCount && countEl) countEl.innerHTML = newCount.innerHTML;
+          if (pagination && newPagination) pagination.innerHTML = newPagination.innerHTML;
+          history.replaceState(null, '', url.replace(`&section_id={{ section.id }}`, ''));
+        })
+        .catch(() => form.requestSubmit());
+    }
+
+    updateView(viewInput.value || 'grid');
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Oshea Collection",
+  "settings": [
+    { "type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16 },
+    { "type": "text", "id": "about_heading", "label": "About heading", "default": "About " },
+    { "type": "textarea", "id": "about_text", "label": "Fallback about text", "default": "Share details about this collection or category here." }
+  ],
+  "presets": [
+    { "name": "Oshea Collection" }
+  ]
+}
+{% endschema %}

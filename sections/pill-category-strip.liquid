@@ -1,0 +1,245 @@
+{%- liquid
+  assign block_count = section.blocks.size
+-%}
+
+<style>
+  .pcs {
+    padding: {{ section.settings.padding_top | default: 24 }}px 12px {{ section.settings.padding_bottom | default: 24 }}px;
+    background: #ffffff;
+  }
+  .pcs__inner {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  .pcs__viewport {
+    overflow: hidden;
+  }
+  .pcs__track {
+    display: flex;
+    gap: 10px;
+    transition: transform 260ms ease;
+    will-change: transform;
+  }
+  .pcs__item {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid #e6e6e6;
+    border-radius: 999px;
+    background: #fff;
+    min-width: 160px;
+    max-width: 220px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+  }
+  .pcs__image {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #f3f3f3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid #e7e7e7;
+    flex-shrink: 0;
+  }
+  .pcs__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+  }
+  .pcs__placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #e7e7e7;
+  }
+  .pcs__text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0b2f1b;
+    white-space: nowrap;
+  }
+  .pcs__link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .pcs__controls {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin: 10px 0 0;
+  }
+  .pcs__arrow {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid #dcdcdc;
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease, color 150ms ease, opacity 150ms ease;
+  }
+  .pcs__arrow:hover:not([disabled]) {
+    border-color: #0b8c53;
+    color: #0b8c53;
+    background-color: #e9f6ef;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+  }
+  .pcs__arrow[disabled] {
+    opacity: 1;
+    cursor: pointer;
+  }
+  .pcs__arrow:focus-visible {
+    outline: 2px solid #0b8c53;
+    outline-offset: 2px;
+  }
+  @media (max-width: 900px) {
+    .pcs__item { min-width: 140px; }
+  }
+  @media (max-width: 600px) {
+    .pcs__item { min-width: 120px; }
+  }
+</style>
+
+<section class="pcs" id="pill-category-strip-{{ section.id }}">
+  <div class="pcs__inner">
+    <div class="pcs__viewport">
+      <div class="pcs__track">
+        {%- if block_count > 0 -%}
+          {%- for block in section.blocks -%}
+            <div class="pcs__item" {{ block.shopify_attributes }}>
+              {%- if block.settings.link != blank -%}<a class="pcs__link" href="{{ block.settings.link }}">{%- endif -%}
+              <span class="pcs__image">
+                {%- if block.settings.image != blank -%}
+                  <img src="{{ block.settings.image | image_url: width: 160 }}" alt="{{ block.settings.title | escape }}">
+                {%- else -%}
+                  <span class="pcs__placeholder"></span>
+                {%- endif -%}
+              </span>
+              <span class="pcs__text">{{ block.settings.title | default: 'Category' }}</span>
+              {%- if block.settings.link != blank -%}</a>{%- endif -%}
+            </div>
+          {%- endfor -%}
+          {%- assign filler = 12 | minus: block_count -%}
+          {%- if filler > 0 -%}
+            {%- for i in (1..filler) -%}
+              <div class="pcs__item">
+                <span class="pcs__image"><span class="pcs__placeholder"></span></span>
+                <span class="pcs__text">Category</span>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        {%- else -%}
+          {%- for i in (1..12) -%}
+            <div class="pcs__item">
+              <span class="pcs__image"><span class="pcs__placeholder"></span></span>
+              <span class="pcs__text">Category</span>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+    <div class="pcs__controls">
+      <button class="pcs__arrow prev" type="button" aria-label="Previous">&#8592;</button>
+      <button class="pcs__arrow next" type="button" aria-label="Next">&#8594;</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const root = document.getElementById('pill-category-strip-{{ section.id }}');
+    if (!root) return;
+    const track = root.querySelector('.pcs__track');
+    const prevBtn = root.querySelector('.pcs__arrow.prev');
+    const nextBtn = root.querySelector('.pcs__arrow.next');
+    const items = () => Array.from(track.children);
+    let index = 0;
+
+    function perView() {
+      const w = window.innerWidth;
+      if (w >= 1400) return 10;
+      if (w >= 1100) return 9;
+      if (w >= 900) return 7;
+      if (w >= 700) return 6;
+      if (w >= 520) return 5;
+      return 4;
+    }
+
+    function clamp() {
+      const total = items().length;
+      const max = Math.max(0, Math.ceil(total - perView()));
+      index = Math.max(0, Math.min(index, max));
+      prevBtn.disabled = false;
+      nextBtn.disabled = false;
+    }
+
+    function update() {
+      const list = items();
+      if (list.length === 0) return;
+      const cardWidth = list[0].getBoundingClientRect().width + 10; // gap
+      clamp();
+      track.style.transform = `translateX(${-index * cardWidth}px)`;
+    }
+
+    prevBtn.addEventListener('click', () => { index -= 1; update(); });
+    nextBtn.addEventListener('click', () => { index += 1; update(); });
+    window.addEventListener('resize', update);
+
+    // Touch swipe
+    let startX = 0;
+    let deltaX = 0;
+    let isDown = false;
+    root.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      startX = t.clientX;
+      isDown = true;
+      deltaX = 0;
+    });
+    root.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      deltaX = e.touches[0].clientX - startX;
+    });
+    root.addEventListener('touchend', () => {
+      if (!isDown) return;
+      const threshold = 30;
+      if (deltaX < -threshold) index += 1;
+      if (deltaX > threshold) index -= 1;
+      update();
+      isDown = false;
+    });
+
+    update();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Pill category strip",
+  "settings": [
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Pill",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Category" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Pill category strip" }
+  ]
+}
+{% endschema %}

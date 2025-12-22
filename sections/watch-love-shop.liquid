@@ -1,0 +1,411 @@
+{%- liquid
+  assign block_count = section.blocks.size
+-%}
+
+<style>
+  .wls {
+    padding: {{ section.settings.padding_top | default: 24 }}px 12px {{ section.settings.padding_bottom | default: 24 }}px;
+    background: #fff;
+    text-align: center;
+  }
+  .wls__inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .wls__title {
+    margin: 0 0 14px 0;
+    font-size: 26px;
+    font-weight: 800;
+    color: #0b2f1b;
+  }
+  .wls__slider {
+    position: relative;
+    padding: 0 48px 12px;
+  }
+  .wls__viewport {
+    overflow: hidden;
+  }
+  .wls__track {
+    display: flex;
+    gap: 12px;
+    transition: transform 260ms ease;
+    will-change: transform;
+  }
+  .wls__card {
+    flex: 0 0 auto;
+    width: 180px;
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+  .wls__video {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    background: #f3f3f3;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .wls__video video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .wls__placeholder {
+    width: 100%;
+    height: 100%;
+    background: #e7e7e7;
+  }
+  .wls__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .wls__views {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+  }
+  .wls__info {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .wls__product-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 800;
+    color: #0b2f1b;
+    line-height: 1.4;
+  }
+  .wls__price {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0b2f1b;
+  }
+  .watch-love-shop .add-to-cart-btn {
+    width: 100%;
+    background-color: #e6f4ea;
+    color: #0f5132;
+    border: none;
+    border-radius: 999px;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+  }
+  .watch-love-shop .add-to-cart-btn:hover:not([disabled]) {
+    background-color: #111111;
+    color: #ffffff;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+  }
+  .watch-love-shop .add-to-cart-btn:active:not([disabled]) {
+    background-color: #000000;
+    color: #ffffff;
+  }
+  .watch-love-shop .add-to-cart-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #d9e7df;
+    color: #ffffff;
+  }
+  .wls__controls {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+  .wls__arrow {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #dcdcdc;
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease, color 150ms ease, opacity 150ms ease;
+    pointer-events: auto;
+  }
+  .wls__arrow:hover:not([disabled]) {
+    border-color: #0b8c53;
+    color: #0b8c53;
+    background-color: #e9f6ef;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+  }
+  .wls__arrow[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .wls__arrow:focus-visible {
+    outline: 2px solid #0b8c53;
+    outline-offset: 2px;
+  }
+  .wls__arrow { color: #0b2f1b; }
+  @media (max-width: 1100px) {
+    .wls__card { width: 160px; }
+  }
+  @media (max-width: 860px) {
+    .wls__card { width: 150px; }
+  }
+  @media (max-width: 640px) {
+    .wls__card { width: 140px; }
+  }
+</style>
+
+<section class="wls" id="watch-love-shop-{{ section.id }}">
+  <div class="wls__inner">
+    <h2 class="wls__title">{{ section.settings.heading }}</h2>
+    <div class="wls__slider">
+      <div class="wls__viewport">
+        <div class="wls__track">
+          {%- if block_count > 0 -%}
+            {%- for block in section.blocks -%}
+              {%- assign product_obj = all_products[block.settings.product] -%}
+              {%- if product_obj and product_obj.variants.size > 0 -%}
+                {%- assign variant_id = product_obj.selected_or_first_available_variant.id | default: product_obj.variants.first.id -%}
+              {%- else -%}
+                {%- assign product_obj = nil -%}
+                {%- assign variant_id = nil -%}
+              {%- endif -%}
+              <div class="wls__card" {{ block.shopify_attributes }}>
+                <div class="wls__video">
+                  {%- if block.settings.video != blank -%}
+                    {{ block.settings.video | video_tag: controls: false, autoplay: false, muted: true, loop: true, playsinline: true }}
+                  {%- else -%}
+                    <div class="wls__placeholder"></div>
+                  {%- endif -%}
+                  <span class="wls__play">&#9658;</span>
+                  {%- if block.settings.views != blank -%}
+                    <span class="wls__views">{{ block.settings.views }}</span>
+                  {%- endif -%}
+                </div>
+                <div class="wls__info">
+                  <h3 class="wls__product-title">{{ block.settings.product_title | default: product_obj.title | default: 'Product title' }}</h3>
+                  <span class="wls__price">
+                    {%- if product_obj and product_obj.price -%}
+                      {{ product_obj.price | money_without_trailing_zeros }}
+                    {%- else -%}
+                      {{ block.settings.price | default: '₹0' }}
+                    {%- endif -%}
+                  </span>
+                </div>
+                {%- if product_obj and variant_id -%}
+                  <form method="post" action="/cart/add" class="watch-love-shop__form">
+                    <input type="hidden" name="id" value="{{ variant_id }}">
+                    <button class="add-to-cart-btn" type="submit">
+                      {{ block.settings.button_label | default: 'Add To Cart' }}
+                    </button>
+                  </form>
+                {%- else -%}
+                  <button class="add-to-cart-btn" type="button" disabled>
+                    {{ block.settings.button_label | default: 'Add To Cart' }}
+                  </button>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            {%- for i in (1..10) -%}
+              {%- assign product_obj = nil -%}
+              {%- if product_obj and product_obj.variants.size > 0 -%}
+                {%- assign variant_id = product_obj.selected_or_first_available_variant.id | default: product_obj.variants.first.id -%}
+              {%- else -%}
+                {%- assign product_obj = nil -%}
+                {%- assign variant_id = nil -%}
+              {%- endif -%}
+              <div class="wls__card">
+                <div class="wls__video"><div class="wls__placeholder"></div><span class="wls__play">&#9658;</span></div>
+                <div class="wls__info">
+                  <h3 class="wls__product-title">{{ product_obj.title | default: 'Product title' }}</h3>
+                  <span class="wls__price">
+                    {%- if product_obj and product_obj.price -%}
+                      {{ product_obj.price | money_without_trailing_zeros }}
+                    {%- else -%}
+                      ₹0
+                    {%- endif -%}
+                  </span>
+                </div>
+                {%- if product_obj and variant_id -%}
+                  <form method="post" action="/cart/add" class="watch-love-shop__form">
+                    <input type="hidden" name="id" value="{{ variant_id }}">
+                    <button class="add-to-cart-btn" type="submit">{{ section.settings.button_label | default: 'Add To Cart' }}</button>
+                  </form>
+                {%- else -%}
+                  <button class="add-to-cart-btn" type="button" disabled>{{ section.settings.button_label | default: 'Add To Cart' }}</button>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+      <div class="wls__controls">
+        <button class="wls__arrow prev" type="button" aria-label="Previous">&#8592;</button>
+        <button class="wls__arrow next" type="button" aria-label="Next">&#8594;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const root = document.getElementById('watch-love-shop-{{ section.id }}');
+    if (!root) return;
+    const track = root.querySelector('.wls__track');
+    const prevBtn = root.querySelector('.wls__arrow.prev');
+    const nextBtn = root.querySelector('.wls__arrow.next');
+    const items = () => Array.from(track.children);
+    let index = 0;
+
+    function perView() {
+      const first = items()[0];
+      const viewport = root.querySelector('.wls__viewport');
+      if (!first || !viewport) return 1;
+      const cardWidth = first.getBoundingClientRect().width + 12; // gap
+      return Math.max(1, Math.floor(viewport.clientWidth / cardWidth));
+    }
+
+    function clamp() {
+      const total = items().length;
+      const max = Math.max(0, Math.ceil(total - perView()));
+      index = Math.max(0, Math.min(index, max));
+      prevBtn.disabled = index <= 0;
+      nextBtn.disabled = index >= max;
+    }
+
+    function update() {
+      const list = items();
+      if (list.length === 0) return;
+      const cardWidth = list[0].getBoundingClientRect().width + 12; // gap
+      clamp();
+      track.style.transform = `translateX(${-index * cardWidth}px)`;
+    }
+
+    prevBtn.addEventListener('click', () => { index -= 1; update(); });
+    nextBtn.addEventListener('click', () => { index += 1; update(); });
+    window.addEventListener('resize', update);
+
+    // Touch swipe
+    let startX = 0;
+    let deltaX = 0;
+    let isDown = false;
+    root.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      startX = t.clientX;
+      isDown = true;
+      deltaX = 0;
+    });
+    root.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      deltaX = e.touches[0].clientX - startX;
+    });
+    root.addEventListener('touchend', () => {
+      if (!isDown) return;
+      const threshold = 40;
+      if (deltaX < -threshold) index += 1;
+      if (deltaX > threshold) index -= 1;
+      update();
+      isDown = false;
+    });
+
+    // AJAX add to cart
+    root.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.wls__button');
+      if (!btn || btn.disabled) return;
+      const variantId = btn.dataset.variantId;
+      if (!variantId) return;
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = 'Adding...';
+      try {
+        await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ id: variantId, quantity: 1 })
+        });
+        const drawer = document.querySelector('cart-drawer');
+        if (drawer && typeof drawer.open === 'function') drawer.open();
+        document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+        btn.textContent = 'Added';
+      } catch (err) {
+        console.error('Add to cart failed', err);
+        btn.textContent = 'Error';
+      } finally {
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.disabled = false;
+        }, 1200);
+      }
+    });
+
+    update();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Watch love shop",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Watch it! Love it! Shop it !" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 }
+  ],
+  "blocks": [
+    {
+      "type": "video_item",
+      "name": "Video item",
+      "settings": [
+        { "type": "video", "id": "video", "label": "Video" },
+        { "type": "text", "id": "views", "label": "Views", "default": "21k" },
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "text", "id": "product_title", "label": "Product title", "default": "Product title" },
+        { "type": "text", "id": "price", "label": "Price", "default": "₹0" },
+        { "type": "text", "id": "button_label", "label": "Add to cart label", "default": "Add To Cart" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Watch love shop" }
+  ]
+}
+{% endschema %}
+
+
+
+
+
+
+
+
+
+
+

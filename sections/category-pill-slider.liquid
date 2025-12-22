@@ -1,0 +1,163 @@
+{% assign section_id = section.id %}
+<section id="category-pill-slider-{{ section_id }}" class="category-pill-slider-section">
+  <div class="cps-inner">
+    <div class="cps-slider-controls">
+      <button class="cps-arrow cps-arrow-left" aria-label="Previous categories">&#8592;</button>
+      <button class="cps-arrow cps-arrow-right" aria-label="Next categories">&#8594;</button>
+    </div>
+    <div class="cps-slider-content">
+      <div class="cps-slider-track">
+        {% assign block_count = section.blocks.size %}
+        {% for block in section.blocks %}
+          <div class="cps-slider-item">
+            <a href="{{ block.settings.link }}" class="cps-card">
+              <div class="cps-image-wrap">
+                {% if block.settings.image != blank %}
+                  <img src="{{ block.settings.image | img_url: '120x120' }}" alt="{{ block.settings.title }}" loading="lazy" />
+                {% else %}
+                  <div class="cps-image-placeholder"></div>
+                {% endif %}
+              </div>
+              <div class="cps-category-name">{{ block.settings.title }}</div>
+            </a>
+          </div>
+        {% endfor %}
+        {% if block_count == 0 %}
+          {% for i in (1..12) %}
+            <div class="cps-slider-item">
+              <div class="cps-card">
+                <div class="cps-image-wrap">
+                  <div class="cps-image-placeholder"></div>
+                </div>
+                <div class="cps-category-name">Category</div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <style>
+    :root { --cps-green: #1ea64a; --cps-dark: #0b2f1b; }
+    .category-pill-slider-section { padding: 24px 0 0 0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color: var(--cps-dark); }
+    .cps-inner { max-width: 1300px; margin: 0 auto; position: relative; }
+    .cps-slider-controls { position: absolute; right: 12px; top: 0; display: flex; gap: 8px; z-index: 2; }
+    .cps-arrow { background: #fff; border: 1px solid #e6e6e6; width: 36px; height: 36px; border-radius: 18px; cursor: pointer; pointer-events: auto; font-size: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07); transition: background 0.2s, color 0.2s, border-color 0.2s; }
+    .cps-arrow:hover { background: #0b8c53; color: #fff; border-color: #0b8c53; }
+    .cps-arrow:disabled { cursor: pointer !important; pointer-events: auto !important; }
+    .cps-arrow[data-disabled="true"],
+    .cps-arrow[data-disabled="true"]:hover {
+      opacity: 0.45;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+      background: #f9f9f9;
+      color: #c5c5c5;
+      border-color: #ededed;
+    }
+    .cps-slider-content { overflow: hidden; position: relative; }
+    .cps-slider-track { display: flex; align-items: stretch; transition: transform 500ms cubic-bezier(.22,.9,.35,1); will-change: transform; }
+    .cps-slider-item { box-sizing: border-box; padding: 8px; }
+    .cps-card { display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid #e6e6e6; border-radius: 32px; padding: 8px 22px 8px 12px; text-decoration: none; color: inherit; min-width: 180px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: box-shadow 0.2s, border-color 0.2s; }
+    .cps-card:hover { box-shadow: 0 4px 16px rgba(30,166,74,0.10); border-color: var(--cps-green); }
+    .cps-image-wrap { background: #fff; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 48px; width: 48px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .cps-image-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
+    .cps-category-name { font-weight: 700; font-size: 15px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cps-image-placeholder { width: 40px; height: 40px; background: #e6e6e6; border-radius: 50%; }
+    @media (max-width: 1200px) { .cps-card { min-width: 140px; } }
+    @media (max-width: 900px) { .cps-card { min-width: 120px; } }
+    @media (max-width: 600px) { .cps-card { min-width: 100px; padding: 6px 12px 6px 8px; } }
+  </style>
+
+  <script>
+    (function(){
+      var root = document.getElementById('category-pill-slider-{{ section_id }}');
+      if (!root) return;
+      var track = root.querySelector('.cps-slider-track');
+      var items = Array.prototype.slice.call(track.querySelectorAll('.cps-slider-item'));
+      var leftBtn = root.querySelector('.cps-arrow-left');
+      var rightBtn = root.querySelector('.cps-arrow-right');
+      var basePerView = parseInt({{ section.settings.items_per_row | default: 8 }});
+      var total = items.length;
+      if (!total || !leftBtn || !rightBtn) return;
+      var currentPerView = basePerView;
+      var index = currentPerView;
+      function computeItemsPerView(){
+        var w = window.innerWidth;
+        if (w >= 1200) return basePerView;
+        if (w >= 900) return 6;
+        if (w >= 600) return 4;
+        return 2;
+      }
+      function itemWidthPercent(){ return 100 / currentPerView; }
+      function setFlex(){
+        items.forEach(function(it){ it.style.flex = '0 0 ' + itemWidthPercent() + '%'; });
+      }
+      function cloneItems(){
+        Array.from(track.querySelectorAll('.cps-slider-item[data-clone]')).forEach(function(n){ n.parentNode.removeChild(n); });
+        for (var i=0;i<currentPerView && i<total;i++){
+          var clone = items[i].cloneNode(true); clone.setAttribute('data-clone','after'); track.appendChild(clone); }
+        for (i=total-1;i>=0 && (total -1 - i) < currentPerView;i--){ var clone2 = items[i].cloneNode(true); clone2.setAttribute('data-clone','before'); track.insertBefore(clone2, track.firstChild); }
+      }
+      function updatePos(animate){ track.style.transition = animate ? '' : 'none'; track.style.transform = 'translateX(' + (- (index * itemWidthPercent())) + '%)'; }
+      function next(){
+        if (rightBtn.dataset.disabled === 'true') return;
+        index++; updatePos(true);
+      }
+      function prev(){
+        if (leftBtn.dataset.disabled === 'true') return;
+        index--; updatePos(true);
+      }
+      track.addEventListener('transitionend', function(){
+        if (index >= total + currentPerView){ index = currentPerView; updatePos(false); }
+        if (index < currentPerView){ index = total + index; updatePos(false); }
+      });
+      leftBtn.addEventListener('click', prev);
+      rightBtn.addEventListener('click', next);
+      // Touch support
+      var startX = 0, currentX = 0, isDown = false, moved = false;
+      track.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; isDown = true; track.style.transition = 'none'; });
+      track.addEventListener('touchmove', function(e){ if (!isDown) return; currentX = e.touches[0].clientX; var dx = currentX - startX; var pct = dx / root.querySelector('.cps-slider-content').clientWidth * 100; track.style.transform = 'translateX(' + ( - (index * itemWidthPercent()) + pct ) + '%)'; moved = true; });
+      track.addEventListener('touchend', function(e){ if (!isDown) return; isDown = false; if (!moved){ return; } var dx = currentX - startX; if (dx < -40) { next(); } else if (dx > 40) { prev(); } else { updatePos(true); } moved = false; });
+      // Responsive
+      function reinit(){
+        currentPerView = computeItemsPerView();
+        if (total <= currentPerView) {
+          leftBtn.dataset.disabled = 'true'; rightBtn.dataset.disabled = 'true';
+          leftBtn.removeAttribute('disabled'); rightBtn.removeAttribute('disabled');
+          Array.from(track.querySelectorAll('.cps-slider-item[data-clone]')).forEach(function(n){ n.parentNode.removeChild(n); });
+          index = 0; setFlex(); track.style.transition = 'none'; track.style.transform = 'translateX(0)';
+          return;
+        }
+        leftBtn.dataset.disabled = 'false'; rightBtn.dataset.disabled = 'false';
+        leftBtn.removeAttribute('disabled'); rightBtn.removeAttribute('disabled');
+        index = currentPerView; setFlex(); cloneItems(); updatePos(false);
+      }
+      window.addEventListener('resize', function(){ reinit(); });
+      // Initial setup
+      leftBtn.removeAttribute('disabled'); rightBtn.removeAttribute('disabled');
+      reinit();
+    })();
+  </script>
+
+  {% schema %}
+  {
+    "name": "Category Pill Slider",
+    "settings": [
+      {"type": "number", "id": "items_per_row", "label": "Items per row", "default": 8}
+    ],
+    "blocks": [
+      {
+        "type": "category",
+        "name": "Category Item",
+        "settings": [
+          {"type": "image_picker", "id": "image", "label": "Category Image"},
+          {"type": "text", "id": "title", "label": "Category Title"},
+          {"type": "url", "id": "link", "label": "Link to Collection or Page"}
+        ]
+      }
+    ],
+    "presets": [{"name": "Category Pill Slider", "category": "Collection"}]
+  }
+  {% endschema %}
+</section>

@@ -1,0 +1,302 @@
+{%- liquid
+  assign block_count = section.blocks.size
+-%}
+
+<style>
+  .sbst {
+    padding: {{ section.settings.padding_top | default: 24 }}px 12px {{ section.settings.padding_bottom | default: 24 }}px;
+    background: #fff;
+  }
+  .sbst__inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .sbst__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .sbst__title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0b2f1b;
+  }
+  .sbst__link {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0b8c53;
+    text-decoration: none;
+  }
+  .sbst__link:hover { text-decoration: underline; }
+  .sbst__slider {
+    position: relative;
+  }
+  .sbst__viewport {
+    overflow: hidden;
+  }
+  .sbst__track {
+    display: flex;
+    gap: 14px;
+    transition: transform 260ms ease;
+    will-change: transform;
+  }
+  .sbst__card {
+    flex: 0 0 auto;
+    width: 240px;
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .sbst__image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #f3f3f3;
+    overflow: hidden;
+  }
+  .sbst__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .sbst__placeholder {
+    width: 100%;
+    height: 100%;
+    background: #e7e7e7;
+  }
+  .sbst__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+  }
+  .sbst__text {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0b2f1b;
+  }
+  .sbst__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #dcdcdc;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #0b2f1b;
+    font-weight: 700;
+  }
+  .sbst__arrow {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #dcdcdc;
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease, color 150ms ease, opacity 150ms ease;
+  }
+  .sbst__arrow:hover {
+    border-color: #0b8c53;
+    color: #0b8c53;
+    background-color: #e9f6ef;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+  }
+  .sbst__arrow[data-disabled="true"] {
+    opacity: 0.45;
+    cursor: default;
+    pointer-events: auto;
+    border-color: #dcdcdc;
+    background: #fff;
+    color: #0b2f1b;
+    box-shadow: none;
+  }
+  .sbst__arrow:focus-visible {
+    outline: 2px solid #0b8c53;
+    outline-offset: 2px;
+  }
+  .sbst__controls {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+  @media (max-width: 1024px) {
+    .sbst__card { width: 220px; }
+  }
+  @media (max-width: 820px) {
+    .sbst__card { width: 200px; }
+  }
+  @media (max-width: 640px) {
+    .sbst__header { flex-direction: column; align-items: flex-start; }
+    .sbst__card { width: 180px; }
+  }
+</style>
+
+<section class="sbst" id="shop-by-skin-type-{{ section.id }}">
+  <div class="sbst__inner">
+    <div class="sbst__header">
+      <h2 class="sbst__title">{{ section.settings.heading }}</h2>
+      {%- if section.settings.shop_all_link != blank -%}
+        <a class="sbst__link" href="{{ section.settings.shop_all_link }}">{{ section.settings.shop_all_text }}</a>
+      {%- endif -%}
+    </div>
+
+    <div class="sbst__slider">
+      <div class="sbst__viewport">
+        <div class="sbst__track">
+          {%- if block_count > 0 -%}
+            {%- for block in section.blocks -%}
+              <div class="sbst__card" {{ block.shopify_attributes }}>
+                {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}" class="sbst__link" style="text-decoration:none;color:inherit;">{%- endif -%}
+                <div class="sbst__image">
+                  {%- if block.settings.image != blank -%}
+                    <img src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.title | escape }}">
+                  {%- else -%}
+                    <div class="sbst__placeholder"></div>
+                  {%- endif -%}
+                </div>
+                <div class="sbst__footer">
+                  <span class="sbst__text">{{ block.settings.title | default: 'Skin Type' }}</span>
+                  <span class="sbst__icon">&#8594;</span>
+                </div>
+                {%- if block.settings.link != blank -%}</a>{%- endif -%}
+              </div>
+            {%- endfor -%}
+            {%- assign filler = 8 | minus: block_count -%}
+            {%- if filler > 0 -%}
+              {%- for i in (1..filler) -%}
+                <div class="sbst__card">
+                  <div class="sbst__image"><div class="sbst__placeholder"></div></div>
+                  <div class="sbst__footer">
+                    <span class="sbst__text">Skin Type</span>
+                    <span class="sbst__icon">&#8594;</span>
+                  </div>
+                </div>
+              {%- endfor -%}
+            {%- endif -%}
+          {%- else -%}
+            {%- for i in (1..8) -%}
+              <div class="sbst__card">
+                <div class="sbst__image"><div class="sbst__placeholder"></div></div>
+                <div class="sbst__footer">
+                  <span class="sbst__text">Skin Type</span>
+                  <span class="sbst__icon">&#8594;</span>
+                </div>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+      <div class="sbst__controls">
+        <button class="sbst__arrow prev" type="button" aria-label="Previous">&#8592;</button>
+        <button class="sbst__arrow next" type="button" aria-label="Next">&#8594;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const root = document.getElementById('shop-by-skin-type-{{ section.id }}');
+    if (!root) return;
+    const track = root.querySelector('.sbst__track');
+    const prevBtn = root.querySelector('.sbst__arrow.prev');
+    const nextBtn = root.querySelector('.sbst__arrow.next');
+    const items = () => Array.from(track.children);
+    let index = 0;
+
+    function perView() {
+      const w = window.innerWidth;
+      if (w >= 1400) return 5;
+      if (w >= 1100) return 4;
+      if (w >= 820) return 3;
+      if (w >= 600) return 2;
+      return 1.2;
+    }
+
+    function clamp() {
+      const total = items().length;
+      const max = Math.max(0, total - 1);
+      index = Math.max(0, Math.min(index, max));
+      const prevOff = index <= 0;
+      const nextOff = index >= max;
+      prevBtn.dataset.disabled = prevOff ? 'true' : 'false';
+      nextBtn.dataset.disabled = nextOff ? 'true' : 'false';
+    }
+
+    function update() {
+      const list = items();
+      if (list.length === 0) return;
+      const cardWidth = list[0].getBoundingClientRect().width + 14; // gap
+      clamp();
+      track.style.transform = `translateX(${-index * cardWidth}px)`;
+    }
+
+    prevBtn.addEventListener('click', () => { if (prevBtn.dataset.disabled === 'true') return; index -= 1; update(); });
+    nextBtn.addEventListener('click', () => { if (nextBtn.dataset.disabled === 'true') return; index += 1; update(); });
+    window.addEventListener('resize', update);
+
+    // Touch swipe
+    let startX = 0;
+    let deltaX = 0;
+    let isDown = false;
+    root.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      startX = t.clientX;
+      isDown = true;
+      deltaX = 0;
+    });
+    root.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      deltaX = e.touches[0].clientX - startX;
+    });
+    root.addEventListener('touchend', () => {
+      if (!isDown) return;
+      const threshold = 40;
+      if (deltaX < -threshold) index += 1;
+      if (deltaX > threshold) index -= 1;
+      update();
+      isDown = false;
+    });
+
+    update();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Shop by skin type",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop By Skin Type" },
+    { "type": "text", "id": "shop_all_text", "label": "Shop all label", "default": "Shop All Products >" },
+    { "type": "url", "id": "shop_all_link", "label": "Shop all link", "default": "/collections/all" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 }
+  ],
+  "blocks": [
+    {
+      "type": "skin_type",
+      "name": "Skin Type",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Skin Type" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Shop by skin type" }
+  ]
+}
+{% endschema %}

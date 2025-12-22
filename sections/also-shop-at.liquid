@@ -1,0 +1,158 @@
+{% liquid
+  assign heading_text = 'You Can Also Shop At'
+%}
+
+<div id="also-shop-at-{{ section.id }}" class="also-shop-at">
+  <div class="page-width">
+    <div class="also-shop-at__header">
+      <h2 class="also-shop-at__title">{{ heading_text }}</h2>
+    </div>
+    <div class="also-shop-at__list" role="list">
+      {% for block in section.blocks %}
+        {% liquid
+          assign image = block.settings.image
+          assign link = block.settings.link
+          assign alt_text = block.settings.alt_text | default: image.alt | default: 'Brand logo'
+        %}
+        {% if link != blank %}
+          <a href="{{ link }}" class="also-shop-at__card" aria-label="{{ alt_text | escape }}" {{ block.shopify_attributes }}>
+        {% else %}
+          <div class="also-shop-at__card" {{ block.shopify_attributes }}>
+        {% endif %}
+            <div class="also-shop-at__card-inner">
+              {% if image != blank %}
+                {{ image | image_url: width: 320 | image_tag: class: 'also-shop-at__logo', loading: 'lazy', alt: alt_text | escape }}
+              {% else %}
+                <div class="also-shop-at__placeholder" aria-hidden="true"></div>
+              {% endif %}
+            </div>
+        {% if link != blank %}
+          </a>
+        {% else %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+  #also-shop-at-{{ section.id }} {
+    padding: 48px 0;
+  }
+
+  #also-shop-at-{{ section.id }} .also-shop-at__title {
+    margin: 0 0 24px;
+    font-size: 1.75rem;
+    text-align: center;
+  }
+
+  #also-shop-at-{{ section.id }} .also-shop-at__list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  #also-shop-at-{{ section.id }} .also-shop-at__card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #e6e6e6;
+    border-radius: 12px;
+    background: #fff;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  }
+
+  #also-shop-at-{{ section.id }} .also-shop-at__card-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    min-height: 140px;
+  }
+
+  #also-shop-at-{{ section.id }} .also-shop-at__card:hover,
+  #also-shop-at-{{ section.id }} .also-shop-at__card:focus-visible {
+    transform: translateY(-2px) scale(1.01);
+    border-color: #dcdcdc;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    outline: none;
+  }
+
+  #also-shop-at-{{ section.id }} .also-shop-at__logo {
+    max-height: 80px;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  #also-shop-at-{{ section.id }} .also-shop-at__placeholder {
+    width: 100%;
+    max-width: 140px;
+    aspect-ratio: 1 / 1;
+    border: 1px dashed #e1e1e1;
+    border-radius: 12px;
+    background: #f6f6f6;
+  }
+
+  @media (max-width: 749px) {
+    #also-shop-at-{{ section.id }} .also-shop-at__list {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 4px 4px;
+      scroll-snap-type: x mandatory;
+    }
+
+    #also-shop-at-{{ section.id }} .also-shop-at__card {
+      flex: 0 0 72%;
+      max-width: 72%;
+      scroll-snap-align: start;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Also shop at",
+  "max_blocks": 12,
+  "settings": [],
+  "blocks": [
+    {
+      "type": "logo_item",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Also shop at",
+      "blocks": [
+        { "type": "logo_item" },
+        { "type": "logo_item" },
+        { "type": "logo_item" },
+        { "type": "logo_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,342 @@
+{%- liquid
+  assign block_count = section.blocks.size
+-%}
+
+<style>
+  .mhc {
+    padding: {{ section.settings.padding_top | default: 24 }}px 12px {{ section.settings.padding_bottom | default: 24 }}px;
+    background: #fff;
+  }
+  .mhc__inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .mhc__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-end;
+    margin-bottom: 16px;
+  }
+  .mhc__heading {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0b2f1b;
+  }
+  .mhc__sub {
+    margin: 6px 0 0;
+    color: #4d5b51;
+    font-size: 14px;
+  }
+  .mhc__link {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0b8c53;
+    text-decoration: none;
+  }
+  .mhc__link:hover { text-decoration: underline; }
+  .mhc__slider {
+    position: relative;
+    padding-bottom: 48px;
+  }
+  .mhc__viewport {
+    overflow: hidden;
+  }
+  .mhc__track {
+    display: flex;
+    gap: 14px;
+    transition: transform 260ms ease;
+    will-change: transform;
+  }
+  .mhc__card {
+    flex: 0 0 auto;
+    width: 240px;
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  .mhc__badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #f0534d;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .mhc__image-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #f3f3f3;
+    overflow: hidden;
+  }
+  .mhc__image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .mhc__placeholder {
+    width: 100%;
+    height: 100%;
+    background: #e7e7e7;
+  }
+  .mhc__body {
+    padding: 12px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .mhc__category {
+    font-size: 12px;
+    font-weight: 700;
+    color: #6a746f;
+    text-transform: uppercase;
+  }
+  .mhc__title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: #0b2f1b;
+    line-height: 1.35;
+  }
+  .mhc__prices {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mhc__sale {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0b2f1b;
+  }
+  .mhc__compare {
+    font-size: 12px;
+    color: #8a8f8c;
+    text-decoration: line-through;
+  }
+  .mhc__controls {
+    position: absolute;
+    right: 0;
+    bottom: 6px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .mhc__divider {
+    height: 2px;
+    background: linear-gradient(90deg, #0b8c53 40%, transparent 100%);
+    margin-top: 12px;
+  }
+  .mhc__arrow {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #dcdcdc;
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease, color 150ms ease, opacity 150ms ease;
+  }
+  .mhc__arrow:hover:not([disabled]) {
+    border-color: #0b8c53;
+    color: #0b8c53;
+    background-color: #e9f6ef;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+  }
+  .mhc__arrow[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .mhc__arrow:focus-visible {
+    outline: 2px solid #0b8c53;
+    outline-offset: 2px;
+  }
+  @media (max-width: 1100px) {
+    .mhc__card { width: 220px; }
+  }
+  @media (max-width: 860px) {
+    .mhc__card { width: 200px; }
+  }
+  @media (max-width: 640px) {
+    .mhc__card { width: 180px; }
+    .mhc__header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<section class="mhc" id="must-have-combos-{{ section.id }}">
+  <div class="mhc__inner">
+    <div class="mhc__header">
+      <div>
+        <h2 class="mhc__heading">{{ section.settings.heading }}</h2>
+        {%- if section.settings.subheading != blank -%}
+          <p class="mhc__sub">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+      </div>
+      {%- if section.settings.shop_all_link != blank -%}
+        <a class="mhc__link" href="{{ section.settings.shop_all_link }}">{{ section.settings.shop_all_text }}</a>
+      {%- endif -%}
+    </div>
+
+    <div class="mhc__slider">
+      <div class="mhc__viewport">
+        <div class="mhc__track">
+          {%- if block_count > 0 -%}
+            {%- for block in section.blocks -%}
+              <div class="mhc__card" {{ block.shopify_attributes }}>
+                {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}" style="text-decoration:none;color:inherit;display:block;">{%- endif -%}
+                <div class="mhc__image-wrap">
+                  {%- if block.settings.badge_text != blank -%}
+                    <span class="mhc__badge">{{ block.settings.badge_text }}</span>
+                  {%- endif -%}
+                  {%- if block.settings.image != blank -%}
+                    <img src="{{ block.settings.image | image_url: width: 700 }}" alt="{{ block.settings.title | escape }}">
+                  {%- else -%}
+                    <div class="mhc__placeholder"></div>
+                  {%- endif -%}
+                </div>
+                <div class="mhc__body">
+                  <span class="mhc__category">{{ block.settings.category | default: 'Category' }}</span>
+                  <h3 class="mhc__title">{{ block.settings.title | default: 'Combo title' }}</h3>
+                  <div class="mhc__prices">
+                    <span class="mhc__sale">{{ block.settings.sale_price | default: '₹0' }}</span>
+                    <span class="mhc__compare">{{ block.settings.compare_price | default: '₹0' }}</span>
+                  </div>
+                </div>
+                {%- if block.settings.link != blank -%}</a>{%- endif -%}
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            {%- for i in (1..8) -%}
+              <div class="mhc__card">
+                <div class="mhc__image-wrap">
+                  <div class="mhc__placeholder"></div>
+                </div>
+                <div class="mhc__body">
+                  <span class="mhc__category">Category</span>
+                  <h3 class="mhc__title">Combo title</h3>
+                  <div class="mhc__prices">
+                    <span class="mhc__sale">₹0</span>
+                    <span class="mhc__compare">₹0</span>
+                  </div>
+                </div>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+      <div class="mhc__controls">
+        <div class="mhc__divider"></div>
+        <button class="mhc__arrow prev" type="button" aria-label="Previous">&#8592;</button>
+        <button class="mhc__arrow next" type="button" aria-label="Next">&#8594;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const root = document.getElementById('must-have-combos-{{ section.id }}');
+    if (!root) return;
+    const track = root.querySelector('.mhc__track');
+    const prevBtn = root.querySelector('.mhc__arrow.prev');
+    const nextBtn = root.querySelector('.mhc__arrow.next');
+    const items = () => Array.from(track.children);
+    let index = 0;
+
+    function perView() {
+      const w = window.innerWidth;
+      if (w >= 1400) return 5;
+      if (w >= 1100) return 4;
+      if (w >= 860) return 3;
+      if (w >= 640) return 2;
+      return 1.2;
+    }
+
+    function clamp() {
+      const total = items().length;
+      const max = Math.max(0, Math.ceil(total - perView()));
+      index = Math.max(0, Math.min(index, max));
+      prevBtn.disabled = index <= 0;
+      nextBtn.disabled = index >= max;
+    }
+
+    function update() {
+      const list = items();
+      if (list.length === 0) return;
+      const cardWidth = list[0].getBoundingClientRect().width + 14; // gap
+      clamp();
+      track.style.transform = `translateX(${-index * cardWidth}px)`;
+    }
+
+    prevBtn.addEventListener('click', () => { index -= 1; update(); });
+    nextBtn.addEventListener('click', () => { index += 1; update(); });
+    window.addEventListener('resize', update);
+
+    // Touch swipe
+    let startX = 0;
+    let deltaX = 0;
+    let isDown = false;
+    root.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      startX = t.clientX;
+      isDown = true;
+      deltaX = 0;
+    });
+    root.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      deltaX = e.touches[0].clientX - startX;
+    });
+    root.addEventListener('touchend', () => {
+      if (!isDown) return;
+      const threshold = 40;
+      if (deltaX < -threshold) index += 1;
+      if (deltaX > threshold) index -= 1;
+      update();
+      isDown = false;
+    });
+
+    update();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Must-have combos",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Must-Have Combo’s" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Perfectly paired products that work better together — for complete, effortless skincare." },
+    { "type": "text", "id": "shop_all_text", "label": "Shop all label", "default": "Shop All Combo’s >" },
+    { "type": "url", "id": "shop_all_link", "label": "Shop all link", "default": "/collections/all" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 }
+  ],
+  "blocks": [
+    {
+      "type": "combo",
+      "name": "Combo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "badge_text", "label": "Badge text", "default": "-20%" },
+        { "type": "text", "id": "category", "label": "Category", "default": "Category" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Combo title" },
+        { "type": "text", "id": "sale_price", "label": "Sale price", "default": "₹0" },
+        { "type": "text", "id": "compare_price", "label": "Compare-at price", "default": "₹0" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Must-have combos" }
+  ]
+}
+{% endschema %}

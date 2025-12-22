@@ -1,0 +1,211 @@
+{%- liquid
+  assign block_count = section.blocks.size
+-%}
+
+<style>
+  .sbb {
+    padding: {{ section.settings.padding_top | default: 24 }}px 12px {{ section.settings.padding_bottom | default: 24 }}px;
+    background: #fff;
+  }
+  .sbb__inner {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  .sbb__title {
+    text-align: center;
+    margin: 0 0 16px 0;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0b2f1b;
+  }
+  .sbb__viewport {
+    overflow: hidden;
+  }
+  .sbb__track {
+    display: flex;
+    gap: 10px;
+    transition: transform 260ms ease;
+    will-change: transform;
+  }
+  .sbb__pill {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid #e6e6e6;
+    border-radius: 999px;
+    background: #fff;
+    min-width: 150px;
+    max-width: 220px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+  }
+  .sbb__image {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #f3f3f3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid #e7e7e7;
+    flex-shrink: 0;
+  }
+  .sbb__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+  }
+  .sbb__placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #e7e7e7;
+  }
+  .sbb__text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0b2f1b;
+    white-space: nowrap;
+  }
+  .sbb__link {
+    color: inherit;
+    text-decoration: none;
+  }
+  @media (max-width: 900px) {
+    .sbb__pill { min-width: 140px; }
+  }
+  @media (max-width: 600px) {
+    .sbb__pill { min-width: 120px; }
+  }
+</style>
+
+<section class="sbb" id="shop-by-benefits-{{ section.id }}">
+  <div class="sbb__inner">
+    <h2 class="sbb__title">{{ section.settings.heading }}</h2>
+    <div class="sbb__viewport">
+      <div class="sbb__track">
+        {%- if block_count > 0 -%}
+          {%- for block in section.blocks -%}
+            <div class="sbb__pill" {{ block.shopify_attributes }}>
+              {%- if block.settings.link != blank -%}<a class="sbb__link" href="{{ block.settings.link }}">{%- endif -%}
+              <span class="sbb__image">
+                {%- if block.settings.image != blank -%}
+                  <img src="{{ block.settings.image | image_url: width: 160 }}" alt="{{ block.settings.title | escape }}">
+                {%- else -%}
+                  <span class="sbb__placeholder"></span>
+                {%- endif -%}
+              </span>
+              <span class="sbb__text">{{ block.settings.title | default: 'Benefit' }}</span>
+              {%- if block.settings.link != blank -%}</a>{%- endif -%}
+            </div>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for i in (1..9) -%}
+            <div class="sbb__pill">
+              <span class="sbb__image"><span class="sbb__placeholder"></span></span>
+              <span class="sbb__text">Benefit</span>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const root = document.getElementById('shop-by-benefits-{{ section.id }}');
+    if (!root) return;
+    const track = root.querySelector('.sbb__track');
+    const items = () => Array.from(track.children);
+    let index = 0;
+
+    function perView() {
+      const w = window.innerWidth;
+      if (w >= 1400) return 9;
+      if (w >= 1100) return 8;
+      if (w >= 900) return 7;
+      if (w >= 700) return 5;
+      if (w >= 520) return 4;
+      return 3;
+    }
+
+    function clamp() {
+      const total = items().length;
+      const max = Math.max(0, Math.ceil(total - perView()));
+      index = Math.max(0, Math.min(index, max));
+    }
+
+    function update() {
+      const list = items();
+      if (list.length === 0) return;
+      const cardWidth = list[0].getBoundingClientRect().width + 10; // gap
+      clamp();
+      track.style.transform = `translateX(${-index * cardWidth}px)`;
+    }
+
+    // Touch swipe
+    let startX = 0;
+    let deltaX = 0;
+    let isDown = false;
+    root.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      startX = t.clientX;
+      isDown = true;
+      deltaX = 0;
+    });
+    root.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      deltaX = e.touches[0].clientX - startX;
+    });
+    root.addEventListener('touchend', () => {
+      if (!isDown) return;
+      const threshold = 30;
+      if (deltaX < -threshold) index += 1;
+      if (deltaX > threshold) index -= 1;
+      update();
+      isDown = false;
+    });
+
+    // Mouse wheel horizontal scroll (smooth)
+    root.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault();
+        index += e.deltaX > 0 ? 1 : -1;
+        update();
+      }
+    }, { passive: false });
+
+    update();
+    window.addEventListener('resize', update);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Shop by benefits",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop by Benefits" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Benefit" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Shop by benefits" }
+  ]
+}
+{% endschema %}

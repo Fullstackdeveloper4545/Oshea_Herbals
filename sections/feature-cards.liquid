@@ -1,0 +1,72 @@
+{%- unless request.page_type == 'product' -%}
+{%- style -%}
+  .feature-cards { max-width:1400px; margin:18px auto; padding:0 12px; }
+  .feature-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+  .feature-card{ position:relative; overflow:hidden; border-radius:12px; height:220px; background-size:cover; background-position:center; display:flex; flex-direction:column; }
+  .feature-card__overlay{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.18) 60%); transition:opacity .25s ease; }
+  .feature-card__center{ position:relative; z-index:2; display:flex; align-items:center; justify-content:center; flex:1 1 auto; padding:20px; }
+  .feature-card__logo{ max-width:60%; max-height:120px; object-fit:contain; filter:brightness(1); }
+  .feature-card__footer{ position:relative; z-index:3; background:#fff; display:flex; align-items:center; justify-content:space-between; padding:12px 16px; }
+  .feature-card__title{ color:#111; font-weight:700; font-size:13px; }
+  .feature-card__cta{ width:36px; height:36px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.04); }
+  .feature-card__cta svg{ transform:translateX(0); }
+  .feature-card:hover .feature-card__overlay{ opacity:0.03; }
+  @media (max-width:900px){ .feature-grid{ grid-template-columns:1fr; } }
+{%- endstyle -%}
+
+<section class="feature-cards" aria-label="Featured ranges">
+  <div class="feature-grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        {%- assign img = block.settings.image -%}
+        <a href="{{ block.settings.link }}" class="feature-card" style="background-image:url('{{ img | image_url: width:1400 }}')" aria-label="{{ block.settings.title }}">
+          <div class="feature-card__overlay"></div>
+          <div class="feature-card__footer">
+            <div class="feature-card__title">{{ block.settings.title }}</div>
+            
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- else -%}
+      <!-- Fallback demo cards so the section is visible without blocks -->
+      <a href="#" class="feature-card" style="background:linear-gradient(180deg,#e9f0ef,#cfd8d6);">
+        <div class="feature-card__overlay"></div>
+        <div class="feature-card__center"><div class="feature-card__logo" style="font-weight:700;font-size:34px;color:#fff;">PhytoDERMA</div></div>
+        <div class="feature-card__footer"><div class="feature-card__title">PhytoDerma</div><div class="feature-card__cta" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" ><path d="M9 6l6 6-6 6" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      </a>
+
+      <a href="#" class="feature-card" style="background:linear-gradient(180deg,#e9efe6,#d4dfd5);">
+        <div class="feature-card__overlay"></div>
+        <div class="feature-card__center"><div class="feature-card__logo" style="font-weight:700;font-size:34px;color:#fff;">Oshea</div></div>
+        <div class="feature-card__footer"><div class="feature-card__title">Oshea</div><div class="feature-card__cta" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6l6 6-6 6" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      </a>
+
+      <a href="#" class="feature-card" style="background:linear-gradient(180deg,#f3e9ea,#e9d6d9);">
+        <div class="feature-card__overlay"></div>
+        <div class="feature-card__center"><div class="feature-card__logo" style="font-weight:700;font-size:34px;color:#fff;">Oshea Colours</div></div>
+        <div class="feature-card__footer"><div class="feature-card__title">Oshea Colours</div><div class="feature-card__cta" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6l6 6-6 6" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      </a>
+    {%- endif -%}
+  </div>
+</section>
+{%- endunless -%}
+
+{% schema %}
+{
+  "name": "Feature Cards",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Card image" },
+        { "type": "text", "id": "title", "label": "Card title" },
+        { "type": "url", "id": "link", "label": "Link (URL)" }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [ { "name": "Feature Cards" } ]
+}
+{% endschema %}

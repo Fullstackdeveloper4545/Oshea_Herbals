@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "oshea-collection",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

@@ -1,0 +1,131 @@
+{%- style -%}
+  .track-order {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 16px;
+  }
+
+  .track-order__card {
+    width: min(920px, 100%);
+    border: 1px solid #ddd;
+    border-radius: 18px;
+    padding: 32px 28px 36px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    background: #fff;
+  }
+
+  .track-order__heading {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 26px;
+  }
+
+  .track-order__tabs {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    font-weight: 600;
+    color: #7c7c7c;
+    margin-bottom: 18px;
+  }
+
+  .track-order__tabs button {
+    background: transparent;
+    border: none;
+    padding: 8px 4px;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+
+  .track-order__tabs button.is-active {
+    color: #111;
+    border-color: #111;
+  }
+
+  .track-order__form {
+    display: grid;
+    gap: 14px;
+  }
+
+  .track-order__form input {
+    width: 100%;
+    border: 1px solid #c8c8c8;
+    border-radius: 6px;
+    padding: 12px 12px;
+    font-size: 15px;
+  }
+
+  .track-order__alt {
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    margin: 6px 0 2px;
+  }
+
+  .track-order__alt a {
+    color: #000;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .track-order__cta {
+    margin-top: 6px;
+  }
+
+  .track-order__cta button {
+    width: 100%;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .track-order__cta button:hover {
+    opacity: 0.9;
+  }
+{%- endstyle -%}
+
+<div class="track-order">
+  <div class="track-order__card">
+    <h1 class="track-order__heading">Track your order</h1>
+
+    <div class="track-order__tabs" role="tablist" aria-label="Track order method">
+      <button type="button" class="is-active" aria-selected="true" role="tab">Order number</button>
+      <button type="button" aria-selected="false" role="tab">Tracking number</button>
+    </div>
+
+    <form class="track-order__form">
+      <label class="visually-hidden" for="track-order-number">Order number</label>
+      <input id="track-order-number" name="order_number" type="text" placeholder="Order number" required>
+
+      <label class="visually-hidden" for="track-email">Email</label>
+      <input id="track-email" name="email" type="email" placeholder="Email" required>
+
+      <div class="track-order__alt">
+        Verify by <a href="#">phone number</a>
+      </div>
+
+      <div class="track-order__cta">
+        <button type="submit">Track</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Track order",
+  "tag": "section",
+  "class": "section section-track-order",
+  "settings": []
+}
+{% endschema %}

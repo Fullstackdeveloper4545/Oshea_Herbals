@@ -1,0 +1,171 @@
+{%- style -%}
+  .double-announcement-slider {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  .das-bar {
+    width: 100%;
+    overflow: hidden;
+    display: block;
+  }
+
+  .das-inner {
+    display: flex;
+    width: 100%;
+    position: relative;
+  }
+
+  .das-track {
+    display: flex;
+    transition: transform 320ms cubic-bezier(.2,.8,.2,1);
+    will-change: transform;
+    width: 100%;
+  }
+
+  .das-slide {
+    min-width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 1rem; /* reduced vertical padding for tighter header */
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  .das-bar .das-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: 0;
+    color: #fff;
+    font-size: 18px;
+    line-height: 1;
+    padding: 8px 12px;
+    cursor: pointer;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .das-bar .das-arrow:focus { outline: 2px solid rgba(255,255,255,0.2); }
+
+  .das-bar .das-arrow-left { left: 8px; }
+  .das-bar .das-arrow-right { right: 8px; }
+
+  /* colors */
+  .das-bar.bar--green .das-slide { background: #008443; }
+  .das-bar.bar--red .das-slide { background: #B73221; }
+
+  /* make sure arrows contrast on small screens */
+  .das-bar .das-arrow svg { display:block; }
+
+  @media (max-width: 749px) {
+    .das-slide { padding: 0.6rem 1rem; font-size: 0.9rem; }
+    .das-bar .das-arrow { font-size: 16px; padding: 6px 8px; }
+  }
+
+  /* hide default gap/scroll */
+  .das-bar .das-track { -webkit-overflow-scrolling: touch; }
+{%- endstyle -%}
+
+<div class="double-announcement-slider">
+  <!-- TOP BAR (GREEN) -->
+  <div class="das-bar bar--green" data-bar="1">
+    <div class="das-inner">
+      <button class="das-arrow das-arrow-left" aria-label="Previous announcement">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <div class="das-track" role="list">
+        <div class="das-slide" role="listitem">Flat 7% OFF on First Order + Additional 25 OFF on Pre-paid Orders</div>
+        <div class="das-slide" role="listitem">Launch offer: Buy any 2 perfumes @ 1299</div>
+      </div>
+
+      <button class="das-arrow das-arrow-right" aria-label="Next announcement">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR (RED) -->
+  <div class="das-bar bar--red" data-bar="2">
+    <div class="das-inner">
+      <button class="das-arrow das-arrow-left" aria-label="Previous announcement">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <div class="das-track" role="list">
+        <div class="das-slide" role="listitem">Flat 30% OFF above 999</div>
+        <div class="das-slide" role="listitem">Flat 15% OFF above 599</div>
+        <div class="das-slide" role="listitem">Flat 20% OFF above 799</div>
+      </div>
+
+      <button class="das-arrow das-arrow-right" aria-label="Next announcement">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    function Slider(barEl){
+      this.barEl = barEl;
+      this.track = barEl.querySelector('.das-track');
+      this.slides = Array.from(this.track.children);
+      this.total = this.slides.length;
+      this.index = 0;
+
+      // set widths (each slide is 100%); track width is total*100% handled by flex
+      this.update();
+
+      var left = barEl.querySelector('.das-arrow-left');
+      var right = barEl.querySelector('.das-arrow-right');
+
+      left.addEventListener('click', this.prev.bind(this));
+      right.addEventListener('click', this.next.bind(this));
+
+      // keyboard accessibility: left/right arrows when focused inside bar
+      barEl.addEventListener('keydown', function(e){
+        if(e.key === 'ArrowLeft') this.prev();
+        if(e.key === 'ArrowRight') this.next();
+      }.bind(this));
+    }
+
+    Slider.prototype.goTo = function(i){
+      if(i < 0) i = this.total - 1;
+      if(i >= this.total) i = 0;
+      this.index = i;
+      var translate = - (100 * this.index);
+      this.track.style.transform = 'translateX(' + translate + '%)';
+    };
+
+    Slider.prototype.prev = function(){
+      this.goTo(this.index - 1);
+    };
+
+    Slider.prototype.next = function(){
+      this.goTo(this.index + 1);
+    };
+
+    Slider.prototype.update = function(){
+      // ensure first slide visible
+      this.goTo(this.index);
+    };
+
+    // init both bars
+    document.addEventListener('DOMContentLoaded', function(){
+      var bars = Array.from(document.querySelectorAll('.das-bar'));
+      bars.forEach(function(bar){ new Slider(bar); });
+    });
+  })();
+</script>

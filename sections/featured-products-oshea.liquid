@@ -1,0 +1,357 @@
+{%- liquid
+  assign new_collection = section.settings.new_collection
+  assign best_collection = section.settings.best_collection
+-%}
+
+{%- style -%}
+  .fp-oshea {
+    padding: 28px 12px 40px;
+    background: #fff;
+  }
+  .fp-oshea__inner {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  .fp-oshea__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  .fp-oshea__title {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0;
+    color: #0b2f1b;
+  }
+  .fp-oshea__sub {
+    margin: 6px 0 0;
+    color: #4d5b51;
+    font-size: 14px;
+  }
+  .fp-oshea__tabs {
+    display: inline-flex;
+    gap: 18px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0b8c53;
+  }
+  .fp-oshea__tab {
+    cursor: pointer;
+    position: relative;
+    padding-bottom: 6px;
+  }
+  .fp-oshea__tab--active {
+    color: #0b8c53;
+  }
+  .fp-oshea__tab--active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: #0b8c53;
+  }
+  .fp-oshea__viewport {
+    position: relative;
+    margin-top: 16px;
+  }
+  .fp-oshea__track {
+    display: flex;
+    gap: 16px;
+    transition: transform 300ms ease;
+    will-change: transform;
+  }
+  .fp-oshea__card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e6e6e6;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    min-width: 210px;
+    max-width: 240px;
+    flex: 0 0 auto;
+  }
+  .fp-oshea__media {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f6f6f6;
+    position: relative;
+  }
+  .fp-oshea__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .fp-oshea__badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #0b8c53;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .fp-oshea__body {
+    padding: 12px 14px 14px;
+  }
+  .fp-oshea__meta {
+    color: #6a746f;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    text-transform: uppercase;
+  }
+  .fp-oshea__name {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0b2f1b;
+    line-height: 1.35;
+  }
+  .fp-oshea__price {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0b2f1b;
+    margin: 0;
+  }
+  .fp-oshea__controls {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+  .fp-oshea__arrow {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid #dcdcdc;
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #0b2f1b;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+  .fp-oshea__arrow:hover {
+    border-color: #0b8c53;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .fp-oshea__empty {
+    padding: 30px 16px;
+    color: #6a746f;
+    font-size: 14px;
+    text-align: center;
+    border: 1px dashed #dcdcdc;
+    border-radius: 12px;
+    margin-top: 12px;
+  }
+  @media (max-width: 900px) {
+    .fp-oshea__title { font-size: 24px; }
+    .fp-oshea__card { min-width: 180px; }
+  }
+  @media (max-width: 600px) {
+    .fp-oshea { padding: 22px 10px 32px; }
+    .fp-oshea__header { flex-direction: column; align-items: flex-start; }
+    .fp-oshea__tabs { margin-top: 8px; }
+  }
+{%- endstyle -%}
+
+<section class="fp-oshea" id="fp-oshea-{{ section.id }}">
+  <div class="fp-oshea__inner">
+    <div class="fp-oshea__header">
+      <div>
+        <h2 class="fp-oshea__title">{{ section.settings.heading }}</h2>
+        {%- if section.settings.subheading != blank -%}
+          <p class="fp-oshea__sub">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+      </div>
+      <div class="fp-oshea__tabs" role="tablist">
+        <span class="fp-oshea__tab fp-oshea__tab--active" data-tab="new" role="tab" aria-selected="true">New Arrivals</span>
+        <span class="fp-oshea__tab" data-tab="best" role="tab" aria-selected="false">Best Sellers</span>
+      </div>
+    </div>
+
+    <div class="fp-oshea__viewport" data-tab-panel="new">
+      {%- liquid
+        assign new_products = empty
+        if new_collection != blank
+          assign new_products = collections[new_collection].products | default: empty
+          if section.settings.product_limit > 0
+            assign new_products = new_products | slice: 0, section.settings.product_limit
+          endif
+        endif
+      -%}
+      <div class="fp-oshea__track" data-track="new">
+        {%- if new_products.size > 0 -%}
+          {%- for product in new_products -%}
+            <article class="fp-oshea__card" {{ product | block: true }}>
+              <div class="fp-oshea__media">
+                {%- if product.featured_image -%}
+                  <img src="{{ product.featured_image | img_url: '500x' }}" alt="{{ product.featured_image.alt | escape }}">
+                {%- else -%}
+                  <div style="width:100%;height:100%;background:#f2f2f2;"></div>
+                {%- endif -%}
+                <span class="fp-oshea__badge">New</span>
+              </div>
+              <div class="fp-oshea__body">
+                <p class="fp-oshea__meta">{{ product.type | default: 'Product' }}</p>
+                <h3 class="fp-oshea__name"><a href="{{ product.url }}" class="link" style="color:inherit;text-decoration:none;">{{ product.title }}</a></h3>
+                <p class="fp-oshea__price">{{ product.price | money }}</p>
+              </div>
+            </article>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for i in (1..5) -%}
+            <article class="fp-oshea__card">
+              <div class="fp-oshea__media">
+                <div style="width:100%;height:100%;background:#f2f2f2;"></div>
+                <span class="fp-oshea__badge">New</span>
+              </div>
+              <div class="fp-oshea__body">
+                <p class="fp-oshea__meta">Product</p>
+                <h3 class="fp-oshea__name">Placeholder</h3>
+                <p class="fp-oshea__price">—</p>
+              </div>
+            </article>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="fp-oshea__viewport" data-tab-panel="best" style="display:none;">
+      {%- liquid
+        assign best_products = empty
+        if best_collection != blank
+          assign best_products = collections[best_collection].products | default: empty
+          if section.settings.product_limit > 0
+            assign best_products = best_products | slice: 0, section.settings.product_limit
+          endif
+        endif
+      -%}
+      <div class="fp-oshea__track" data-track="best">
+        {%- if best_products.size > 0 -%}
+          {%- for product in best_products -%}
+            <article class="fp-oshea__card" {{ product | block: true }}>
+              <div class="fp-oshea__media">
+                {%- if product.featured_image -%}
+                  <img src="{{ product.featured_image | img_url: '500x' }}" alt="{{ product.featured_image.alt | escape }}">
+                {%- else -%}
+                  <div style="width:100%;height:100%;background:#f2f2f2;"></div>
+                {%- endif -%}
+                <span class="fp-oshea__badge">Best</span>
+              </div>
+              <div class="fp-oshea__body">
+                <p class="fp-oshea__meta">{{ product.type | default: 'Product' }}</p>
+                <h3 class="fp-oshea__name"><a href="{{ product.url }}" class="link" style="color:inherit;text-decoration:none;">{{ product.title }}</a></h3>
+                <p class="fp-oshea__price">{{ product.price | money }}</p>
+              </div>
+            </article>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for i in (1..5) -%}
+            <article class="fp-oshea__card">
+              <div class="fp-oshea__media">
+                <div style="width:100%;height:100%;background:#f2f2f2;"></div>
+                <span class="fp-oshea__badge">Best</span>
+              </div>
+              <div class="fp-oshea__body">
+                <p class="fp-oshea__meta">Product</p>
+                <h3 class="fp-oshea__name">Placeholder</h3>
+                <p class="fp-oshea__price">—</p>
+              </div>
+            </article>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="fp-oshea__controls">
+      <button class="fp-oshea__arrow" type="button" data-dir="-1" aria-label="Previous">&#8592;</button>
+      <button class="fp-oshea__arrow" type="button" data-dir="1" aria-label="Next">&#8594;</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const section = document.getElementById('fp-oshea-{{ section.id }}');
+    if (!section) return;
+    const tabs = section.querySelectorAll('.fp-oshea__tab');
+    const panels = section.querySelectorAll('[data-tab-panel]');
+    const arrows = section.querySelectorAll('.fp-oshea__arrow');
+    let currentTab = 'new';
+    let index = 0;
+
+    function getTrack() {
+      return section.querySelector(`[data-track="${currentTab}"]`);
+    }
+    function getCards() {
+      const track = getTrack();
+      return track ? Array.from(track.children) : [];
+    }
+    function itemsPerView() {
+      const w = window.innerWidth;
+      if (w >= 1200) return 5;
+      if (w >= 992) return 4;
+      if (w >= 768) return 3;
+      return 2;
+    }
+    function clampIndex() {
+      const cards = getCards();
+      const max = Math.max(0, cards.length - itemsPerView());
+      index = Math.max(0, Math.min(index, max));
+    }
+    function updateTransform() {
+      const track = getTrack();
+      const cards = getCards();
+      if (!track || cards.length === 0) return;
+      const cardWidth = cards[0].getBoundingClientRect().width + 16; // gap
+      clampIndex();
+      track.style.transform = `translateX(${-index * cardWidth}px)`;
+    }
+    function switchTab(tab) {
+      if (tab === currentTab) return;
+      currentTab = tab;
+      index = 0;
+      tabs.forEach(t => {
+        const active = t.dataset.tab === tab;
+        t.classList.toggle('fp-oshea__tab--active', active);
+        t.setAttribute('aria-selected', active);
+      });
+      panels.forEach(p => p.style.display = p.dataset.tabPanel === tab ? '' : 'none');
+      updateTransform();
+    }
+    tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+    arrows.forEach(btn => btn.addEventListener('click', () => {
+      index += btn.dataset.dir === '1' ? 1 : -1;
+      updateTransform();
+    }));
+    window.addEventListener('resize', updateTransform);
+    updateTransform();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Featured products (Oshea)",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Featured Products" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Discover our newest launches and bestsellers." },
+    { "type": "collection", "id": "new_collection", "label": "New Arrivals collection" },
+    { "type": "collection", "id": "best_collection", "label": "Best Sellers collection" },
+    { "type": "number", "id": "product_limit", "label": "Products per tab", "default": 12 }
+  ],
+  "presets": [
+    { "name": "Featured products (Oshea)" }
+  ]
+}
+{% endschema %}

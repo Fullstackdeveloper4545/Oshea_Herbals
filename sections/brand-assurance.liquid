@@ -1,0 +1,126 @@
+{%- style -%}
+  .brand-assurance {
+    background: #ffffff;
+    padding: 26px 16px 32px;
+  }
+  .brand-assurance__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .brand-assurance__grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px 18px;
+    align-items: center;
+    text-align: center;
+  }
+  .brand-assurance__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #0a9a5b;
+  }
+  .brand-assurance__icon { width: 68px; height: 68px; }
+  .brand-assurance__logo { width: 68px; height: 68px; object-fit: contain; display: block; }
+  .brand-assurance__label {
+    font-weight: 700;
+    font-size: 14px;
+    color: #0b2f1b;
+  }
+  @media (max-width: 900px) {
+    .brand-assurance__grid { grid-template-columns: repeat(3, 1fr); }
+    .brand-assurance__icon { width: 56px; height: 56px; }
+  }
+  @media (max-width: 540px) {
+    .brand-assurance__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+{%- endstyle -%}
+
+<section class="brand-assurance" aria-label="Brand assurance">
+  <div class="brand-assurance__inner">
+    <div class="brand-assurance__grid">
+      <div class="brand-assurance__item">
+        <img
+          class="brand-assurance__logo"
+          src="//www.osheaherbals.com/cdn/shop/files/Mask_group.png?v=1761910940&width=160"
+          width="68"
+          height="68"
+          alt="ISO Certified"
+          loading="lazy"
+        >
+        <div class="brand-assurance__label">ISO Certified</div>
+      </div>
+
+      <div class="brand-assurance__item">
+        <img
+          class="brand-assurance__logo"
+          src="//www.osheaherbals.com/cdn/shop/files/Mask_group_1.png?v=1761910940&width=160"
+          width="68"
+          height="68"
+          alt="Eco-Friendly"
+          loading="lazy"
+        >
+        <div class="brand-assurance__label">Eco-Friendly</div>
+      </div>
+
+      <div class="brand-assurance__item">
+        <img
+          class="brand-assurance__logo"
+          src="//www.osheaherbals.com/cdn/shop/files/Mask_group_2.png?v=1761910941&width=160"
+          width="68"
+          height="68"
+          alt="Herbal Solution"
+          loading="lazy"
+        >
+        <div class="brand-assurance__label">Herbal Solution</div>
+      </div>
+
+      <div class="brand-assurance__item">
+        <img
+          class="brand-assurance__logo"
+          src="//www.osheaherbals.com/cdn/shop/files/Mask_group_3.png?v=1761910941&width=160"
+          width="68"
+          height="68"
+          alt="Made with Love"
+          loading="lazy"
+        >
+        <div class="brand-assurance__label">Made with Love</div>
+      </div>
+
+      <div class="brand-assurance__item">
+        <img
+          class="brand-assurance__logo"
+          src="//www.osheaherbals.com/cdn/shop/files/Mask_group_e5604e0f-2733-4ef5-956d-2d1f3f43f130.png?v=1763461744&width=160"
+          width="68"
+          height="68"
+          alt="15 Years of Trust"
+          loading="lazy"
+        >
+        <div class="brand-assurance__label">15 Years of Trust</div>
+      </div>
+
+      <div class="brand-assurance__item">
+        <img
+          class="brand-assurance__logo"
+          src="//www.osheaherbals.com/cdn/shop/files/Mask_group_1_136c0031-aa9f-44fe-8f1f-754c6c469777.png?v=1763461743&width=160"
+          width="68"
+          height="68"
+          alt="Dermat Tested"
+          loading="lazy"
+        >
+        <div class="brand-assurance__label">Dermat Tested</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Brand assurance",
+  "settings": [],
+  "presets": [
+    { "name": "Brand assurance" }
+  ]
+}
+{% endschema %}

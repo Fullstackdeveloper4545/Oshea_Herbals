@@ -1,0 +1,272 @@
+{%- liquid
+  assign block_count = section.blocks.size
+-%}
+
+<style>
+  .ccs-section {
+    position: relative;
+    overflow: hidden;
+    clear: both;
+    margin: 0;
+    padding: {{ section.settings.padding_top | default: 24 }}px 0 {{ section.settings.padding_bottom | default: 24 }}px;
+    background: #ffffff;
+  }
+  .ccs-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    justify-content: center;
+  }
+  .ccs-viewport {
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+  .ccs-track {
+    display: flex;
+    gap: 32px;
+    transition: transform 0.35s ease;
+    will-change: transform;
+    width: max-content;
+  }
+  .ccs-item {
+    min-width: 135px;
+    flex: 0 0 auto;
+    text-align: center;
+  }
+  .ccs-image {
+    width: 118px;
+    height: 118px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #f1f1f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 14px 36px rgba(0,0,0,0.08);
+  }
+  .ccs-image img {
+    width: 74px;
+    height: 74px;
+    object-fit: contain;
+    border-radius: 50%;
+    display: block;
+  }
+  .ccs-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #eaeaea;
+  }
+  .ccs-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0b2f1b;
+    letter-spacing: 0.2px;
+  }
+  .ccs-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .ccs-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid #0b8c53;
+    background: rgba(11, 47, 27, 0.08);
+    color: #0b8c53;
+    font-size: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 200ms ease, color 200ms ease, transform 200ms ease;
+  }
+  .ccs-arrow:hover:not([disabled]) {
+    background: #0b8c53;
+    color: #fff;
+    transform: translateY(-50%) scale(1.02);
+  }
+  .ccs-arrow[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .ccs-arrow--prev {
+    left: 10px;
+  }
+  .ccs-arrow--next {
+    right: 10px;
+  }
+  @media (max-width: 768px) {
+    .ccs-wrap {
+      gap: 18px;
+      padding: 0 8px;
+    }
+    .ccs-item { min-width: 110px; }
+    .ccs-image { width: 96px; height: 96px; }
+  }
+</style>
+
+<section class="ccs-section" id="category-circle-slider-{{ section.id }}">
+  <div class="page-width ccs-wrap">
+    <button class="ccs-arrow ccs-arrow--prev" type="button" aria-label="Previous">&#8592;</button>
+    <div class="ccs-viewport">
+      <div class="ccs-track">
+        {%- if block_count > 0 -%}
+          {%- for block in section.blocks -%}
+            <div class="ccs-item" {{ block.shopify_attributes }}>
+              {%- if block.settings.link != blank -%}<a class="ccs-link" href="{{ block.settings.link }}">{%- endif -%}
+              <div class="ccs-image">
+                {%- if block.settings.image != blank -%}
+                  <img src="{{ block.settings.image | image_url: width: 220 }}" alt="{{ block.settings.title | escape }}">
+                {%- else -%}
+                  <div class="ccs-placeholder"></div>
+                {%- endif -%}
+              </div>
+              <div class="ccs-title">{{ block.settings.title | default: 'Category' }}</div>
+              {%- if block.settings.link != blank -%}</a>{%- endif -%}
+            </div>
+          {%- endfor -%}
+          {%- assign filler = 14 | minus: block_count -%}
+          {%- if filler > 0 -%}
+            {%- for i in (1..filler) -%}
+              <div class="ccs-item">
+                <div class="ccs-image">
+                  <div class="ccs-placeholder"></div>
+                </div>
+                <div class="ccs-title">Category</div>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        {%- else -%}
+          {%- for i in (1..14) -%}
+            <div class="ccs-item">
+              <div class="ccs-image">
+                <div class="ccs-placeholder"></div>
+              </div>
+              <div class="ccs-title">Category</div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+    <button class="ccs-arrow ccs-arrow--next" type="button" aria-label="Next">&#8594;</button>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const section = document.getElementById('category-circle-slider-{{ section.id }}');
+    if (!section) return;
+    const track = section.querySelector('.ccs-track');
+    const viewport = section.querySelector('.ccs-viewport');
+    const prev = section.querySelector('.ccs-arrow--prev');
+    const next = section.querySelector('.ccs-arrow--next');
+    const gap = parseFloat(getComputedStyle(track).gap || 32);
+    let index = 0;
+
+    const items = () => Array.from(track.children);
+
+    function perView() {
+      const card = items()[0];
+      if (!card) return 1;
+      return viewport.clientWidth / (card.getBoundingClientRect().width + gap);
+    }
+
+    function clamp() {
+      const total = items().length;
+      const max = Math.max(0, total - 1);
+      index = Math.max(0, Math.min(index, max));
+      prev.disabled = index <= 0;
+      next.disabled = index >= max;
+      return max;
+    }
+
+    function update() {
+      const list = items();
+      if (!list.length) return;
+      const width = list[0].getBoundingClientRect().width + gap;
+      const hasOverflow = track.scrollWidth > viewport.clientWidth;
+
+      if (!hasOverflow) {
+        index = 0;
+        track.style.transform = 'translateX(0)';
+        track.style.justifyContent = 'center';
+        prev.disabled = true;
+        next.disabled = true;
+        return;
+      }
+
+      track.style.justifyContent = 'flex-start';
+      clamp();
+      track.style.transform = `translateX(${-index * width}px)`;
+    }
+
+    function step(direction) {
+      index += direction;
+      update();
+    }
+
+    prev.addEventListener('click', () => step(-1));
+    next.addEventListener('click', () => step(1));
+    window.addEventListener('resize', update);
+
+    let startX = 0;
+    let deltaX = 0;
+    let dragging = false;
+
+    viewport.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      dragging = true;
+    });
+    viewport.addEventListener('touchmove', (e) => {
+      if (!dragging) return;
+      deltaX = e.touches[0].clientX - startX;
+    });
+    viewport.addEventListener('touchend', () => {
+      if (!dragging) return;
+      const threshold = 40;
+      if (deltaX < -threshold) step(1);
+      if (deltaX > threshold) step(-1);
+      dragging = false;
+      deltaX = 0;
+    });
+
+    update();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Category circle slider",
+  "settings": [
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Category" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Category circle slider" }
+  ]
+}
+{% endschema %}

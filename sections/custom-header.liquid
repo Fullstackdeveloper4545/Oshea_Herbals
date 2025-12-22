@@ -1,0 +1,1703 @@
+{%- style -%}
+  .custom-header {
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 1200;
+    font-family: inherit;
+  }
+
+  .custom-header__inner { max-width: 1400px; margin: 0 auto; padding: 6px 12px; display:flex; flex-direction:column; }
+
+  /* Top row */
+  .custom-header__top { display:flex; align-items:center; justify-content:flex-start; gap:12px; flex-wrap:wrap; }
+
+  .custom-header__logo img { height:44px; width:auto; display:block; }
+
+  .custom-header__search { flex:1 1 auto; display:flex; justify-content:center; margin:0 12px; }
+  .search-box {
+    width:100%;
+    max-width:none;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    background:#f5f5f5;
+    border-radius:28px;
+    padding:6px 8px;
+    min-height:44px;
+    box-shadow:none !important;
+    border:1px solid #e2e2e2;
+  }
+
+  .search-cat { background:transparent; border:0; padding:8px 12px; border-radius:20px; margin-right:8px; display:flex; align-items:center; color:var(--color-base-accent-1, #334FB4); font-weight:600; cursor:pointer; }
+
+  /* Category dropdown for search */
+  .search-cat-wrap { position:relative; }
+  .search-cat-menu { position:absolute; top:calc(100% + 6px); left:0; min-width:200px; background:#fff; border:1px solid #e6e6e6; box-shadow:0 10px 30px rgba(0,0,0,0.12); border-radius:10px; padding:6px 0; display:none; z-index:1300; }
+  .search-cat-wrap:hover .search-cat-menu,
+  .search-cat-menu.open { display:block; }
+  .search-cat-menu ul { list-style:none; margin:0; padding:4px 0; }
+  .search-cat-menu li { padding:10px 14px; cursor:pointer; font-size:13px; color:#111; transition: background-color 0.15s ease, color 0.15s ease; }
+  .search-cat-menu li:hover { background:#e8f1ff; color:#0f3fa4; }
+  .search-cat-menu li.selected { background:#e8f1ff; color:#0f3fa4; font-weight:600; }
+  .search-cat-button {
+    border: 1px solid #d9d9d9;
+    padding: 8px 14px;
+    border-radius: 28px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    min-width: 150px;
+    justify-content: space-between;
+  }
+
+  .search-input {
+    flex:1;
+    max-width:none;
+    margin:0;
+    border:0;
+    background:transparent;
+    padding:8px 6px;
+    font-size:15px;
+    outline:none;
+    box-shadow:none !important;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  .search-input:focus { box-shadow:none !important; outline:none; }
+  .search-box:focus-within { box-shadow:none !important; }
+
+  .search-btn { background:transparent;border:0;padding:8px 10px;color:var(--color-base-accent-1, #334FB4); cursor:pointer; }
+
+  .custom-header__icons { display:flex; align-items:center; gap:14px; margin-left:auto; }
+  .custom-header__icons a { color:var(--color-base-accent-1, #334FB4); display:flex; align-items:center; justify-content:center; }
+
+  /* Bottom nav */
+  .custom-header__nav { margin-top:0; }
+  .nav-row { display:flex; align-items:center; justify-content:space-between; }
+  .nav-list { display:flex; gap:28px; list-style:none; padding:0; margin:0; width:100%; justify-content:center; flex-wrap:wrap; }
+  .nav-list li { font-weight:700; white-space:nowrap; }
+  .nav-list a { color:#111; text-decoration:none; padding:12px 6px; display:inline-block; }
+
+  .nav-toggle { display:none; background:transparent;border:0;font-size:20px;padding:8px; }
+
+  @media (max-width: 900px) {
+    .custom-header__search { flex:1 1 100%; margin-left:0; }
+    .search-box { max-width:420px; }
+    .nav-list { display:none; }
+    .nav-toggle { display:block; }
+  }
+
+  /* mobile menu open */
+  .nav-open .nav-list { display:flex; flex-direction:column; gap:0; background:#fff; position:absolute; left:0; right:0; top:100%; padding:10px 20px; box-shadow:0 8px 24px rgba(0,0,0,0.08); }
+
+  /* Mega menu */
+  .nav-list .has-mega { position:relative; }
+  .nav-list .has-mega > a { position:relative; z-index:1201; }
+  
+  .mega-menu { 
+     position:absolute; left:-100px; top:100%; width:1000px; background:#fff; border:1px solid #eee; 
+     box-shadow:0 8px 24px rgba(0,0,0,0.12); z-index:1210; 
+     transition: opacity 0.3s ease, visibility 0.3s ease; opacity:0; visibility:hidden;
+     display:none;
+      overflow: visible;
+  }
+  .has-mega:hover .mega-menu { 
+     display:flex; opacity:1; visibility:visible;
+  }
+    /* keep menu visible when hovering the panel itself (avoid disappearing when moving pointer) */
+    .has-mega .mega-menu:hover { display:flex; opacity:1; visibility:visible; }
+  
+  .mega-inner { display:flex; width:100%; }
+
+  .mega-left { 
+     width:180px; border-right:1px solid #eee; padding:12px 0; background:#fafafa;
+    display:flex; flex-direction:column; gap:0;
+  }
+  .mega-cat-btn { 
+     background:transparent; border:0; padding:12px 16px; text-align:left; width:100%; 
+     font-weight:500; cursor:pointer; color:#666; transition: all 0.2s ease; position:relative;
+     border-radius:0; font-size:14px; border-left:3px solid transparent;
+  }
+  .mega-cat-btn .arrow { display:inline-block; margin-left:8px; opacity:0; transition: opacity 0.2s ease; }
+  .mega-cat-btn:hover { background:#f0f0f0; color:#111; }
+   .mega-cat-btn.active { 
+     background:#fff; color:#111; font-weight:700; border-left:3px solid var(--color-base-accent-1, #334FB4); 
+   }
+  .mega-cat-btn.active .arrow { opacity:1; }
+  
+  .mega-right { 
+     flex:1; padding:20px 24px; display:flex; gap:40px; flex-wrap:wrap; align-content:flex-start;
+     max-height:400px; overflow-y:auto;
+  }
+  .mega-panel { 
+     display:none; gap:40px; flex-wrap:wrap; width:100%;
+  }
+  .mega-panel.active { 
+    display:flex;
+  }
+  .mega-column { 
+     display:flex; flex-direction:column; gap:10px; min-width:140px;
+  }
+  .mega-column a { 
+     display:block; padding:4px 0; color:#333; text-decoration:none; transition: color 0.2s ease, font-weight 0.2s ease;
+    font-size:13px;
+  }
+  .mega-column a:hover { 
+     color:var(--color-base-accent-1, #334FB4); font-weight:600;
+  }
+
+    /* Trending product column inside mega menus */
+    .mega-trending { min-width:260px; }
+    .trending-grid { display:flex; flex-direction:column; gap:14px; }
+    .trending-item { display:flex; gap:12px; align-items:flex-start; }
+    .trending-item img { width:92px; height:92px; object-fit:cover; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+    .trending-meta .title { display:block; font-size:13px; font-weight:700; color:#222; }
+  .trending-meta .price { display:block; margin-top:6px; color:#111; font-weight:800; }
+ 
+  .phyto-dropdown .mega-menu {
+    width: 900px;
+  }
+
+  .phyto-dropdown .mega-inner {
+    flex-direction: column;
+    gap: 20px;
+    padding: 18px;
+  }
+
+  .phyto-hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+  }
+
+  .phyto-hero-card {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    min-height: 140px;
+    background: #fafafa;
+    border: 1px solid #eee;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .phyto-hero-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .phyto-hero-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    color: #b5b5b5;
+    text-transform: uppercase;
+  }
+
+  .phyto-hero-copy {
+    position: relative;
+    z-index: 1;
+    padding: 16px;
+    width: 100%;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
+    color: #fff;
+  }
+
+  .phyto-hero-copy .title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .phyto-hero-copy .subtitle {
+    font-size: 0.8rem;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+  }
+
+  .phyto-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+  }
+
+  .phyto-links .mega-column {
+    min-width: 160px;
+  }
+
+  .phyto-links .mega-column a {
+    font-size: 13px;
+    letter-spacing: 0.01em;
+  }
+
+  .phyto-link-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: #777;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  @media (max-width:900px){
+    .phyto-dropdown .mega-menu {
+      width: 100%;
+    }
+
+    .phyto-hero-grid {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+  }
+
+  .skin-dropdown .mega-menu {
+    width: 1000px;
+  }
+
+  .skin-dropdown .mega-inner {
+    flex-direction: column;
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .skin-dropdown .mega-content {
+    display: flex;
+    gap: 0;
+  }
+
+  .skin-dropdown .mega-right {
+    max-height: none;
+    overflow: visible;
+  }
+
+  @media (max-width:900px){
+    .skin-dropdown .mega-inner {
+      padding: 12px;
+      gap: 12px;
+    }
+
+    .skin-dropdown .mega-content {
+      flex-direction: column;
+    }
+  }
+
+  .hair-dropdown .mega-menu {
+    width: 1000px;
+  }
+
+  .hair-dropdown .mega-inner {
+    flex-direction: column;
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .hair-dropdown .mega-content {
+    display: flex;
+    gap: 0;
+  }
+
+  .hair-dropdown .mega-right {
+    max-height: none;
+    overflow: visible;
+  }
+
+  @media (max-width:900px){
+    .hair-dropdown .mega-inner {
+      padding: 12px;
+      gap: 12px;
+    }
+
+    .hair-dropdown .mega-content {
+      flex-direction: column;
+    }
+  }
+
+  .bath-dropdown .mega-menu {
+    width: 1000px;
+  }
+
+  .bath-dropdown .mega-inner {
+    flex-direction: column;
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .bath-dropdown .mega-content {
+    display: flex;
+    gap: 0;
+  }
+
+  .bath-dropdown .mega-right {
+    max-height: none;
+    overflow: visible;
+  }
+
+  @media (max-width:900px){
+    .bath-dropdown .mega-inner {
+      padding: 12px;
+      gap: 12px;
+    }
+
+    .bath-dropdown .mega-content {
+      flex-direction: column;
+    }
+  }
+
+  .range-dropdown .mega-menu {
+    width: 1000px;
+  }
+
+  .range-dropdown .mega-inner {
+    flex-direction: column;
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .range-dropdown .mega-content {
+    display: flex;
+    gap: 0;
+  }
+
+  .range-dropdown .mega-right {
+    max-height: none;
+    overflow: visible;
+  }
+
+  @media (max-width:900px){
+    .range-dropdown .mega-inner {
+      padding: 12px;
+      gap: 12px;
+    }
+
+    .range-dropdown .mega-content {
+      flex-direction: column;
+    }
+  }
+
+  .color-dropdown .mega-menu {
+    width: 1000px;
+  }
+
+  .color-dropdown .mega-inner {
+    flex-direction: column;
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .color-dropdown .mega-content {
+    display: flex;
+    gap: 0;
+  }
+
+  .color-dropdown .mega-right {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .track-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1600;
+    padding: 16px;
+  }
+
+  .track-modal-overlay.is-open {
+    display: flex;
+  }
+
+  .track-modal {
+    width: min(920px, 100%);
+    background: #fff;
+    border-radius: 18px;
+    padding: 32px 28px 36px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+    position: relative;
+  }
+
+  .track-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .track-modal__heading {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 26px;
+  }
+
+  .track-modal__tabs {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    font-weight: 600;
+    color: #7c7c7c;
+    margin-bottom: 18px;
+  }
+
+  .track-modal__tabs button {
+    background: transparent;
+    border: none;
+    padding: 8px 4px;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+
+  .track-modal__tabs button.is-active {
+    color: #111;
+    border-color: #111;
+  }
+
+  .track-modal__form {
+    display: grid;
+    gap: 14px;
+  }
+
+  .track-modal__form input {
+    width: 100%;
+    border: 1px solid #c8c8c8;
+    border-radius: 6px;
+    padding: 12px 12px;
+    font-size: 15px;
+  }
+
+  .track-modal__alt {
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    margin: 6px 0 2px;
+  }
+
+  .track-modal__alt a {
+    color: #000;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .track-modal__cta {
+    margin-top: 6px;
+  }
+
+  .track-modal__cta button {
+    width: 100%;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .track-modal__cta button:hover {
+    opacity: 0.9;
+  }
+
+  @media (max-width:900px){
+    .color-dropdown .mega-inner {
+      padding: 12px;
+      gap: 12px;
+    }
+
+    .color-dropdown .mega-content {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width:900px){
+    .mega-menu { 
+       position:static; box-shadow:none; border:0; opacity:1; visibility:visible; 
+       width:100%; left:0; display:none;
+    }
+     .has-mega:active .mega-menu {
+       display:flex;
+     }
+    .mega-inner { flex-direction:column; }
+     .mega-left { width:100%; border-right:0; border-bottom:1px solid #eee; flex-direction:row; gap:0; padding:0; }
+     .mega-cat-btn { padding:10px 12px; border-left:0; border-bottom:2px solid transparent; }
+     .mega-cat-btn.active { border-left:0; border-bottom:2px solid var(--color-base-accent-1, #334FB4); }
+     .mega-right { padding:12px; flex-direction:column; gap:12px; max-height:none; }
+     .mega-panel { gap:12px; }
+  }
+
+  /* Small flyout style for compact mega menus (used by Edits) */
+  .mega-small-flyout .mega-inner { display:flex; }
+  .mega-small-flyout .mega-left { width:200px; background:#fff; border-right:1px solid #eee; }
+  .mega-small-flyout .mega-right { position:relative; width:0; }
+  .mega-small-flyout .mega-panel { 
+    position:absolute; left:100%; top:0; width:220px; background:#fff; border:1px solid #eee; box-shadow:0 8px 24px rgba(0,0,0,0.12); padding:12px; display:block; opacity:0; visibility:hidden; transform:translateX(8px);
+  }
+  .mega-small-flyout .mega-panel.active { opacity:1; visibility:visible; transform:none; }
+  .mega-small-flyout .mega-left .mega-cat-btn { display:block; border-bottom:0; }
+
+{%- endstyle -%}
+
+<header class="custom-header" role="banner">
+  <div class="custom-header__inner">
+    <div class="custom-header__top">
+      <div class="custom-header__logo">
+        <a href="{{ shop.url }}">
+          {%- assign oshea_asset_url = 'oshea-logo.png' | asset_url -%}
+          {%- if section.settings.logo != blank -%}
+            <img src="{{ section.settings.logo | image_url: width: 300 }}" alt="{{ shop.name }}">
+          {%- elsif settings.logo != blank -%}
+            <img src="{{ settings.logo | image_url: width: 300 }}" alt="{{ shop.name }}">
+          {%- elsif settings.brand_image != blank -%}
+            <img src="{{ settings.brand_image | image_url: width: 300 }}" alt="{{ shop.name }}">
+          {%- elsif oshea_asset_url != blank -%}
+            <img src="{{ oshea_asset_url }}" alt="{{ shop.name }}">
+          {%- else -%}
+            <span style="font-weight:700">{{ shop.name }}</span>
+          {%- endif -%}
+        </a>
+      </div>
+
+      <div class="custom-header__search">
+          <div class="search-box" role="search">
+          <div class="search-cat-wrap">
+            <button class="search-cat search-cat-button" aria-haspopup="listbox" aria-expanded="false">All Categories
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left:6px"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="search-cat-menu" role="listbox" aria-hidden="true">
+              <ul>
+                <li role="option" data-value="all" class="selected">All Categories</li>
+                <li role="option" data-value="cosmetics">Cosmetics</li>
+                <li role="option" data-value="hair-care">Hair Care</li>
+                <li role="option" data-value="skin-care">Skin Care</li>
+              </ul>
+            </div>
+          </div>
+          <input class="search-input" type="search" placeholder="What are you looking for?" aria-label="Search">
+          <button class="search-btn" aria-label="Search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.8"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="custom-header__icons">
+        <button type="button" class="header-track" title="Track Order" aria-label="Track Order" data-track-open style="background:transparent;border:0;padding:0;display:flex;align-items:center;justify-content:center;">
+          <img src="{{ 'tracking.png' | asset_url }}" alt="Track order" style="width:24px;height:24px;display:block;">
+        </button>
+        <a href="{{ routes.cart_url }}" class="header-cart" title="Cart" aria-label="Cart" data-cart-trigger>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M16.3804 16.25H3.61947C3.46585 16.25 3.31752 16.1939 3.20241 16.0922C3.0873 15.9904 3.01334 15.8501 2.99447 15.6977L1.88119 6.32267C1.87089 6.2347 1.87941 6.14556 1.90617 6.06113C1.93294 5.9767 1.97734 5.89893 2.03644 5.83296C2.09553 5.767 2.16797 5.71434 2.24896 5.67849C2.32995 5.64264 2.41763 5.62441 2.50619 5.62501H17.4937C17.5823 5.62441 17.6699 5.64264 17.7509 5.67849C17.8319 5.71434 17.9044 5.767 17.9634 5.83296C18.0225 5.89893 18.0669 5.9767 18.0937 6.06113C18.1205 6.14556 18.129 6.2347 18.1187 6.32267L17.0054 15.6977C16.9865 15.8501 16.9126 15.9904 16.7975 16.0922C16.6824 16.1939 16.534 16.25 16.3804 16.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6.875 5.625V5C6.875 4.1712 7.20424 3.37634 7.79029 2.79029C8.37634 2.20424 9.1712 1.875 10 1.875C10.8288 1.875 11.6237 2.20424 12.2097 2.79029C12.7958 3.37634 13.125 4.1712 13.125 5V5.625" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="custom-header__nav" id="customHeaderNav">
+      <div class="nav-row">
+        <button class="nav-toggle" aria-controls="siteNav" aria-expanded="false">☰</button>
+        <ul id="siteNav" class="nav-list">
+          <li class="has-mega range-dropdown">
+            <a href="#">Shop By Range ▾</a>
+            <div class="mega-menu" role="region" aria-label="Shop By Range">
+              <div class="mega-inner">
+                <div class="mega-content">
+                  <div class="mega-left">
+                    <button class="mega-cat-btn active" data-cat="0">Product Range <span class="arrow">›</span></button>
+                    <button class="mega-cat-btn" data-cat="1">By Concern <span class="arrow">›</span></button>
+                    <button class="mega-cat-btn" data-cat="2">By Ingredients <span class="arrow">›</span></button>
+                    <button class="mega-cat-btn" data-cat="3">By Benefits <span class="arrow">›</span></button>
+                  </div>
+
+                  <div class="mega-right">
+                    <!-- Product Range Panel -->
+                    <div class="mega-panel active" data-cat="0">
+                      <div class="mega-column">
+                        <a href="#">PhytoDerma Skin Care</a>
+                        <a href="#">Radiance D-Tan</a>
+                        <a href="#">Vitamin C</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Sun Protection</a>
+                        <a href="#">Ubtan</a>
+                        <a href="#">Phyto Range</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Conditioner</a>
+                        <a href="#">Papayaclean</a>
+                        <a href="#">Facial Kits</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Oshea Colours</a>
+                        <a href="#">Combos &amp; Kits</a>
+                        <a href="#">New Launches</a>
+                      </div>
+                    </div>
+
+                    <!-- By Concern Panel -->
+                    <div class="mega-panel" data-cat="1">
+                      <div class="mega-column">
+                        <a href="#">Acne</a>
+                        <a href="#">Dullness</a>
+                        <a href="#">Dark Spots</a>
+                        <a href="#">Damaged Hair</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Enlarged Pores</a>
+                        <a href="#">Ageing</a>
+                        <a href="#">Hair Fall</a>
+                        <a href="#">Dryness</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Clogged Pores</a>
+                        <a href="#">Tanning</a>
+                        <a href="#">Dandruff</a>
+                        <a href="#">Wrinkles</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Rough Hair</a>
+                        <a href="#">Pigmentation</a>
+                      </div>
+                    </div>
+
+                    <!-- By Ingredients Panel -->
+                    <div class="mega-panel" data-cat="2">
+                      <div class="mega-column">
+                        <a href="#">Licorice</a>
+                        <a href="#">Rice</a>
+                        <a href="#">Neem</a>
+                        <a href="#">Grape</a>
+                        <a href="#">Apple</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Aloe Vera</a>
+                        <a href="#">Niacinamide</a>
+                        <a href="#">Vitamin E</a>
+                        <a href="#">Vitamin C</a>
+                        <a href="#">Salicylic Acid</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Almond</a>
+                        <a href="#">Turmeric</a>
+                        <a href="#">Lemon</a>
+                        <a href="#">Amla</a>
+                        <a href="#">Shea Butter</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Papaya</a>
+                        <a href="#">Mulberry</a>
+                        <a href="#">Chamomile</a>
+                      </div>
+                    </div>
+
+                    <!-- By Benefits Panel -->
+                    <div class="mega-panel" data-cat="3">
+                      <div class="mega-column">
+                        <a href="#">Reduce Acne</a>
+                        <a href="#">Brightening</a>
+                        <a href="#">Clear Skin</a>
+                        <a href="#">Hair Damage Repair</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Pore Minimizing</a>
+                        <a href="#">Anti-Ageing</a>
+                        <a href="#">Hair Growth</a>
+                        <a href="#">Moisturize</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Deep Cleansing</a>
+                        <a href="#">De-Tan</a>
+                        <a href="#">Anti-Dandruff</a>
+                        <a href="#">Smoothing</a>
+                      </div>
+                      <div class="mega-column">
+                        <a href="#">Reduce Wrinkles</a>
+                        <a href="#">De-Pigmentation</a>
+                        <a href="#">Hydration</a>
+                        <a href="#">Clarifying</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="has-mega phyto-dropdown">
+            <a href="#">PhytoDerma</a>
+            <div class="mega-menu" role="region" aria-label="PhytoDerma">
+              <div class="mega-inner">
+                <div class="phyto-hero-grid">
+                  {%- for i in (1..3) -%}
+                    {%- assign image_key = 'phyto_image_' | append: i -%}
+                    {%- assign title_key = 'phyto_title_' | append: i -%}
+                    {%- assign subtitle_key = 'phyto_subtitle_' | append: i -%}
+                    {%- assign link_key = 'phyto_link_' | append: i -%}
+                    <a
+                      class="phyto-hero-card"
+                      href="{{ section.settings[link_key] | default: '#' }}"
+                    >
+                      {%- if section.settings[image_key] != blank -%}
+                        <img
+                          src="{{ section.settings[image_key] | image_url: width: 800 }}"
+                          alt="{{ section.settings[title_key] | default: 'PhytoDerma highlight' }}"
+                        >
+                      {%- else -%}
+                        <div class="phyto-hero-placeholder">Upload Banner</div>
+                      {%- endif -%}
+                      <div class="phyto-hero-copy">
+                        <p class="title">{{ section.settings[title_key] | default: 'PhytoDerma' }}</p>
+                        <p class="subtitle">{{ section.settings[subtitle_key] | default: 'Add caption' }}</p>
+                      </div>
+                    </a>
+                  {%- endfor -%}
+                </div>
+                <div class="phyto-links">
+                  <div class="mega-column">
+                    <span class="phyto-link-title">Skin Care</span>
+                    <a href="#">PhytoDerma Skin Care</a>
+                    <a href="#">Radiance D-Tan</a>
+                    <a href="#">Vitamin C</a>
+                    <a href="#">Sun Protection</a>
+                  </div>
+                  <div class="mega-column">
+                    <span class="phyto-link-title">Hair &amp; Body</span>
+                    <a href="#">Hair Nourishment</a>
+                    <a href="#">Papayaclean</a>
+                    <a href="#">Conditioner</a>
+                    <a href="#">Body Care</a>
+                  </div>
+                  <div class="mega-column">
+                    <span class="phyto-link-title">Essentials</span>
+                    <a href="#">Facial Kits</a>
+                    <a href="#">Phyto Range</a>
+                    <a href="#">Sun Protection</a>
+                    <a href="#">Ubtan</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="has-mega skin-dropdown">
+            <a href="#">Skin Care ▾</a>
+            <div class="mega-menu" role="region" aria-label="Skin Care">
+              <div class="mega-inner">
+                <div class="phyto-hero-grid">
+                  {%- for i in (1..3) -%}
+                    {%- assign image_key = 'skin_hero_image_' | append: i -%}
+                    {%- assign title_key = 'skin_hero_title_' | append: i -%}
+                    {%- assign subtitle_key = 'skin_hero_subtitle_' | append: i -%}
+                    {%- assign link_key = 'skin_hero_link_' | append: i -%}
+                    <a class="phyto-hero-card" href="{{ section.settings[link_key] | default: '#' }}">
+                      {%- if section.settings[image_key] != blank -%}
+                        <img src="{{ section.settings[image_key] | image_url: width: 900 }}" alt="{{ section.settings[title_key] | default: 'Skin Care highlight' }}">
+                      {%- else -%}
+                        <div class="phyto-hero-placeholder">Upload Banner</div>
+                      {%- endif -%}
+                      <div class="phyto-hero-copy">
+                        <p class="title">{{ section.settings[title_key] | default: 'Skin Care' }}</p>
+                        <p class="subtitle">{{ section.settings[subtitle_key] | default: 'Add caption' }}</p>
+                      </div>
+                    </a>
+                  {%- endfor -%}
+                </div>
+
+                <div class="mega-content">
+                  <div class="mega-left">
+                    <button class="mega-cat-btn active" data-cat="skin-0">Cleanse &amp; Prep <span class="arrow">›</span></button>
+                    <button class="mega-cat-btn" data-cat="skin-1">Treat <span class="arrow">›</span></button>
+                    <button class="mega-cat-btn" data-cat="skin-2">Moisturize &amp; Protect <span class="arrow">›</span></button>
+                  </div>
+
+                  <div class="mega-right">
+                    <div class="mega-panel active" data-cat="skin-0">
+                      <div class="mega-column">
+                        <strong>Cleanse &amp; Prep</strong>
+                        <a href="#">Cleanser</a>
+                        <a href="#">Face Wash</a>
+                        <a href="#">Toner</a>
+                        <a href="#">Face Scrub</a>
+                      </div>
+                    </div>
+
+                    <div class="mega-panel" data-cat="skin-1">
+                      <div class="mega-column">
+                        <strong>Treat</strong>
+                        <a href="#">Face Serum</a>
+                        <a href="#">Face Mask</a>
+                        <a href="#">Face Gel</a>
+                      </div>
+                    </div>
+
+                    <div class="mega-panel" data-cat="skin-2">
+                      <div class="mega-column">
+                        <strong>Moisturize &amp; Protect</strong>
+                        <a href="#">Cream</a>
+                        <a href="#">Moisturiser</a>
+                        <a href="#">Sun Protection</a>
+                        <a href="#">Lip Therapy</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="has-mega hair-dropdown">
+            <a href="#">Hair Care ▾</a>
+            <div class="mega-menu" role="region" aria-label="Hair Care">
+              <div class="mega-inner">
+                <div class="phyto-hero-grid">
+                  {%- for i in (1..3) -%}
+                    {%- assign image_key = 'hair_hero_image_' | append: i -%}
+                    {%- assign title_key = 'hair_hero_title_' | append: i -%}
+                    {%- assign subtitle_key = 'hair_hero_subtitle_' | append: i -%}
+                    {%- assign link_key = 'hair_hero_link_' | append: i -%}
+                    <a class="phyto-hero-card" href="{{ section.settings[link_key] | default: '#' }}">
+                      {%- if section.settings[image_key] != blank -%}
+                        <img src="{{ section.settings[image_key] | image_url: width: 900 }}" alt="{{ section.settings[title_key] | default: 'Hair Care highlight' }}">
+                      {%- else -%}
+                        <div class="phyto-hero-placeholder">Upload Banner</div>
+                      {%- endif -%}
+                      <div class="phyto-hero-copy">
+                        <p class="title">{{ section.settings[title_key] | default: 'Hair Care' }}</p>
+                        <p class="subtitle">{{ section.settings[subtitle_key] | default: 'Add caption' }}</p>
+                      </div>
+                    </a>
+                  {%- endfor -%}
+                </div>
+
+                <div class="mega-content">
+                  <div class="mega-left">
+                    <button class="mega-cat-btn active" data-cat="hair-0">Cleanse <span class="arrow">›</span></button>
+                    <button class="mega-cat-btn" data-cat="hair-1">Treat &amp; Strengthen <span class="arrow">›</span></button>
+                    <button class="mega-cat-btn" data-cat="hair-2">Nourish &amp; Maintain <span class="arrow">›</span></button>
+                  </div>
+
+                  <div class="mega-right">
+                    <div class="mega-panel active" data-cat="hair-0">
+                      <div class="mega-column">
+                        <strong>Cleanse</strong>
+                        <a href="#">Shampoo</a>
+                        <a href="#">Clarifying Shampoo</a>
+                        <a href="#">Sulfate Free</a>
+                      </div>
+                    </div>
+
+                    <div class="mega-panel" data-cat="hair-1">
+                      <div class="mega-column">
+                        <strong>Treat &amp; Strengthen</strong>
+                        <a href="#">Hair Vitalizer</a>
+                        <a href="#">Spa</a>
+                        <a href="#">Henna Pack</a>
+                        <a href="#">Hair Serum</a>
+                      </div>
+                    </div>
+
+                    <div class="mega-panel" data-cat="hair-2">
+                      <div class="mega-column">
+                        <strong>Nourish &amp; Maintain</strong>
+                        <a href="#">Conditioner</a>
+                        <a href="#">Hair Oil</a>
+                        <a href="#">Leave-in Care</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="has-mega bath-dropdown">
+            <a href="#">Bath & Body ▾</a>
+            <div class="mega-menu" role="region" aria-label="Bath & Body">
+              <div class="mega-inner">
+                <div class="phyto-hero-grid">
+                  {%- for i in (1..3) -%}
+                    {%- assign image_key = 'bath_hero_image_' | append: i -%}
+                    {%- assign title_key = 'bath_hero_title_' | append: i -%}
+                    {%- assign subtitle_key = 'bath_hero_subtitle_' | append: i -%}
+                    {%- assign link_key = 'bath_hero_link_' | append: i -%}
+                    <a class="phyto-hero-card" href="{{ section.settings[link_key] | default: '#' }}">
+                      {%- if section.settings[image_key] != blank -%}
+                        <img src="{{ section.settings[image_key] | image_url: width: 900 }}" alt="{{ section.settings[title_key] | default: 'Bath & Body highlight' }}">
+                      {%- else -%}
+                        <div class="phyto-hero-placeholder">Upload Banner</div>
+                      {%- endif -%}
+                      <div class="phyto-hero-copy">
+                        <p class="title">{{ section.settings[title_key] | default: 'Bath & Body' }}</p>
+                        <p class="subtitle">{{ section.settings[subtitle_key] | default: 'Add caption' }}</p>
+                      </div>
+                    </a>
+                  {%- endfor -%}
+                </div>
+
+                <div class="mega-content">
+                  <div class="mega-left">
+                    <button class="mega-cat-btn active" data-cat="bath-0">Cleanse <span class="arrow">›</span></button>
+                    <button class="mega-cat-btn" data-cat="bath-1">Nourish &amp; Moisturize <span class="arrow">›</span></button>
+                    <button class="mega-cat-btn" data-cat="bath-2">Repair &amp; Care <span class="arrow">›</span></button>
+                  </div>
+
+                  <div class="mega-right">
+                    <div class="mega-panel active" data-cat="bath-0">
+                      <div class="mega-column">
+                        <strong>Cleanse</strong>
+                        <a href="#">Body Wash</a>
+                        <a href="#">Hand Cleanser</a>
+                      </div>
+                    </div>
+
+                    <div class="mega-panel" data-cat="bath-1">
+                      <div class="mega-column">
+                        <strong>Nourish &amp; Moisturize</strong>
+                        <a href="#">Body Lotion</a>
+                        <a href="#">Body Oil</a>
+                      </div>
+                    </div>
+
+                    <div class="mega-panel" data-cat="bath-2">
+                      <div class="mega-column">
+                        <strong>Repair &amp; Care</strong>
+                        <a href="#">Body Butter</a>
+                        <a href="#">Hand &amp; Nail Cream</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="has-mega color-dropdown">
+            <a href="#">Color Essentials ▾</a>
+            <div class="mega-menu" role="region" aria-label="Color Essentials">
+              <div class="mega-inner">
+                <div class="phyto-hero-grid">
+                  {%- for i in (1..3) -%}
+                    {%- assign image_key = 'color_hero_image_' | append: i -%}
+                    {%- assign title_key = 'color_hero_title_' | append: i -%}
+                    {%- assign subtitle_key = 'color_hero_subtitle_' | append: i -%}
+                    {%- assign link_key = 'color_hero_link_' | append: i -%}
+                    <a class="phyto-hero-card" href="{{ section.settings[link_key] | default: '#' }}">
+                      {%- if section.settings[image_key] != blank -%}
+                        <img src="{{ section.settings[image_key] | image_url: width: 900 }}" alt="{{ section.settings[title_key] | default: 'Color Essentials highlight' }}">
+                      {%- else -%}
+                        <div class="phyto-hero-placeholder">Upload Banner</div>
+                      {%- endif -%}
+                      <div class="phyto-hero-copy">
+                        <p class="title">{{ section.settings[title_key] | default: 'Color Essentials' }}</p>
+                        <p class="subtitle">{{ section.settings[subtitle_key] | default: 'Add caption' }}</p>
+                      </div>
+                    </a>
+                  {%- endfor -%}
+                </div>
+
+                <div class="mega-content">
+                  <div class="mega-left">
+                    <button class="mega-cat-btn active" data-cat="color-0">Face Essentials <span class="arrow">›</span></button>
+                    <button class="mega-cat-btn" data-cat="color-1">Eye Makeup <span class="arrow">›</span></button>
+                    <button class="mega-cat-btn" data-cat="color-2">Lips &amp; Nails <span class="arrow">›</span></button>
+                  </div>
+
+                  <div class="mega-right">
+                    <div class="mega-panel active" data-cat="color-0">
+                      <div class="mega-column">
+                        <strong>Face Essentials</strong>
+                        <a href="#">BB Cream</a>
+                        <a href="#">Compact</a>
+                        <a href="#">Concealer</a>
+                        <a href="#">Foundation</a>
+                      </div>
+                    </div>
+
+                    <div class="mega-panel" data-cat="color-1">
+                      <div class="mega-column">
+                        <strong>Eye Makeup</strong>
+                        <a href="#">Eyeliner</a>
+                        <a href="#">Kajal</a>
+                        <a href="#">Mascara</a>
+                      </div>
+                    </div>
+
+                    <div class="mega-panel" data-cat="color-2">
+                      <div class="mega-column">
+                        <strong>Lips &amp; Nails</strong>
+                        <a href="#">Lip Color</a>
+                        <a href="#">Lip Gloss</a>
+                        <a href="#">Sindoor</a>
+                        <a href="#">Makeup Remover</a>
+                        <a href="#">Nail Paint</a>
+                        <a href="#">Nail Remover</a>
+                      </div>
+                    </div>
+
+                    <div class="mega-column">
+                      <strong>{{ section.settings.color_hero_heading | default: 'Customize this space' }}</strong>
+                      <p style="margin:6px 0 0; font-size:13px; color:#777;">{{ section.settings.color_hero_subheading | default: 'Add your featured color looks or promos here.' }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li><a href="#">Facial Kit</a></li>
+          <li class="has-mega">
+            <a href="#">Edits ▾</a>
+            <div class="mega-menu" role="region" aria-label="Edits">
+              <div class="mega-inner">
+                <div class="mega-left">
+                  <button class="mega-cat-btn active" data-cat="edit-0">Daily Care <span class="arrow">›</span></button>
+                  <button class="mega-cat-btn" data-cat="edit-1">Brighten &amp; Glow <span class="arrow">›</span></button>
+                  <button class="mega-cat-btn" data-cat="edit-2">Special Picks <span class="arrow">›</span></button>
+                </div>
+
+                <div class="mega-right">
+                  <div class="mega-panel active" data-cat="edit-0">
+                    <div class="mega-column">
+                      <strong>Daily Care</strong>
+                      <a href="#">Neempure</a>
+                      <a href="#">Papayaclean</a>
+                      <a href="#">Almondfine</a>
+                      <a href="#">Ubtan</a>
+                    </div>
+                  </div>
+
+                  <div class="mega-panel" data-cat="edit-1">
+                    <div class="mega-column">
+                      <strong>Brighten &amp; Glow</strong>
+                      <a href="#">Glopure</a>
+                      <a href="#">Radiance D-Tan</a>
+                      <a href="#">Vitamin C</a>
+                      <a href="#">Caffine Pro</a>
+                    </div>
+                  </div>
+
+                  <div class="mega-panel" data-cat="edit-2">
+                    <div class="mega-column">
+                      <strong>Special Picks</strong>
+                      <a href="#">Perfumes for Him and Her</a>
+                      <a href="#">Phyto Range</a>
+                      <a href="#">Sun Protection</a>
+                      <a href="#">Activated Charcoal</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li><a href="#">2 Perfumes @1299</a></li>
+          <li><a href="#">Combos @20% OFF</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="track-modal-overlay" data-track-overlay aria-hidden="true">
+  <div class="track-modal" role="dialog" aria-modal="true" aria-labelledby="track-modal-heading">
+    <button class="track-modal__close" type="button" aria-label="Close track order" data-track-close>×</button>
+    <h2 id="track-modal-heading" class="track-modal__heading">Track your order</h2>
+
+    <div class="track-modal__tabs" role="tablist" aria-label="Track order method">
+      <button type="button" class="is-active" aria-selected="true" role="tab">Order number</button>
+      <button type="button" aria-selected="false" role="tab">Tracking number</button>
+    </div>
+
+    <form class="track-modal__form">
+      <label class="visually-hidden" for="track-order-number-inline">Order number</label>
+      <input id="track-order-number-inline" name="order_number" type="text" placeholder="Order number" required>
+
+      <label class="visually-hidden" for="track-email-inline">Email</label>
+      <input id="track-email-inline" name="email" type="email" placeholder="Email" required>
+
+      <div class="track-modal__alt">
+        Verify by <a href="#">phone number</a>
+      </div>
+
+      <div class="track-modal__cta">
+        <button type="submit">Track</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var root = document.documentElement;
+    var header = document.querySelector('.custom-header');
+    var toggle = document.querySelector('.nav-toggle');
+    var siteNav = document.getElementById('siteNav');
+
+    if(toggle){
+      toggle.addEventListener('click', function(){
+        var expanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', !expanded);
+        document.body.classList.toggle('nav-open');
+      });
+    }
+
+    // Mega menu - scoped category panel switching (per has-mega)
+    var megaMenus = document.querySelectorAll('.has-mega');
+    megaMenus.forEach(function(menu){
+      var btns = menu.querySelectorAll('.mega-cat-btn');
+      var panels = menu.querySelectorAll('.mega-panel');
+      if(!btns.length || !panels.length) return;
+
+      // ensure first panel active
+      btns.forEach(function(b){ b.classList.remove('active'); });
+      panels.forEach(function(p){ p.classList.remove('active'); });
+      btns[0].classList.add('active');
+      panels[0].classList.add('active');
+
+      btns.forEach(function(btn){
+        btn.addEventListener('click', function(e){
+          var catId = this.getAttribute('data-cat');
+          btns.forEach(function(b){ b.classList.remove('active'); });
+          this.classList.add('active');
+          panels.forEach(function(p){
+            p.classList.remove('active');
+            if(p.getAttribute('data-cat') === catId) p.classList.add('active');
+          });
+        });
+
+        btn.addEventListener('mouseenter', function(){
+          var catId = this.getAttribute('data-cat');
+          btns.forEach(function(b){ b.classList.remove('active'); });
+          this.classList.add('active');
+          panels.forEach(function(p){
+            p.classList.remove('active');
+            if(p.getAttribute('data-cat') === catId) p.classList.add('active');
+          });
+        });
+      });
+    });
+
+    // Category dropdown for search - open/close + selection
+    (function(){
+      var catWrap = document.querySelector('.search-cat-wrap');
+      var catBtn = catWrap && catWrap.querySelector('.search-cat');
+      var catMenu = catWrap && catWrap.querySelector('.search-cat-menu');
+      var options = catMenu && catMenu.querySelectorAll('li[role="option"]');
+
+      function closeCatMenu(){
+        if(!catBtn || !catMenu) return;
+        catMenu.classList.remove('open');
+        catMenu.setAttribute('aria-hidden','true');
+        catBtn.setAttribute('aria-expanded','false');
+      }
+
+      function openCatMenu(){
+        if(!catBtn || !catMenu) return;
+        catMenu.classList.add('open');
+        catMenu.setAttribute('aria-hidden','false');
+        catBtn.setAttribute('aria-expanded','true');
+      }
+
+      if(catBtn && catMenu){
+        catBtn.addEventListener('click', function(e){
+          var isOpen = catMenu.classList.contains('open');
+          if(isOpen) closeCatMenu(); else openCatMenu();
+        });
+
+        options.forEach(function(opt){
+          opt.addEventListener('click', function(){
+            options.forEach(function(o){ o.classList.remove('selected'); });
+            this.classList.add('selected');
+            // update button label
+            catBtn.firstChild.nodeValue = this.textContent.trim();
+            closeCatMenu();
+          });
+        });
+
+        // close on outside click
+        document.addEventListener('click', function(e){
+          if(!catWrap.contains(e.target)) closeCatMenu();
+        });
+
+        // keyboard: close on ESC
+        document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCatMenu(); });
+      }
+    })();
+
+    // Track order modal
+    (function(){
+      var openBtn = document.querySelector('[data-track-open]');
+      var overlay = document.querySelector('[data-track-overlay]');
+      var closeBtn = overlay && overlay.querySelector('[data-track-close]');
+
+      function openModal(){
+        if(!overlay) return;
+        overlay.classList.add('is-open');
+        overlay.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal(){
+        if(!overlay) return;
+        overlay.classList.remove('is-open');
+        overlay.setAttribute('aria-hidden','true');
+        document.body.style.overflow = '';
+      }
+
+      if(openBtn && overlay){
+        openBtn.addEventListener('click', function(e){
+          e.preventDefault();
+          openModal();
+        });
+      }
+
+      if(closeBtn){
+        closeBtn.addEventListener('click', closeModal);
+      }
+
+      if(overlay){
+        overlay.addEventListener('click', function(e){
+          if(e.target === overlay) closeModal();
+        });
+      }
+
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape') closeModal();
+      });
+    })();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Custom Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Header logo (overrides theme logo)"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder text",
+      "default": "What are you looking for?"
+    },
+    {
+      "type": "header",
+      "content": "PhytoDerma highlights"
+    },
+    {
+      "type": "image_picker",
+      "id": "phyto_image_1",
+      "label": "PhytoDerma highlight 1 image"
+    },
+    {
+      "type": "text",
+      "id": "phyto_title_1",
+      "label": "Highlight 1 title",
+      "default": "PhytoDerma Skin Care"
+    },
+    {
+      "type": "text",
+      "id": "phyto_subtitle_1",
+      "label": "Highlight 1 subtitle",
+      "default": "Herbal Radiance Daily"
+    },
+    {
+      "type": "url",
+      "id": "phyto_link_1",
+      "label": "Highlight 1 link",
+      "default": "/"
+    },
+    {
+      "type": "image_picker",
+      "id": "phyto_image_2",
+      "label": "PhytoDerma highlight 2 image"
+    },
+    {
+      "type": "text",
+      "id": "phyto_title_2",
+      "label": "Highlight 2 title",
+      "default": "PhytoDerma Hair Care"
+    },
+    {
+      "type": "text",
+      "id": "phyto_subtitle_2",
+      "label": "Highlight 2 subtitle",
+      "default": "Strength, Shine, Nourish"
+    },
+    {
+      "type": "url",
+      "id": "phyto_link_2",
+      "label": "Highlight 2 link",
+      "default": "/"
+    },
+    {
+      "type": "image_picker",
+      "id": "phyto_image_3",
+      "label": "PhytoDerma highlight 3 image"
+    },
+    {
+      "type": "text",
+      "id": "phyto_title_3",
+      "label": "Highlight 3 title",
+      "default": "PhytoDerma Bath & Body"
+    },
+    {
+      "type": "text",
+      "id": "phyto_subtitle_3",
+      "label": "Highlight 3 subtitle",
+      "default": "Pure Refreshing Cleanse"
+    },
+    {
+      "type": "url",
+      "id": "phyto_link_3",
+      "label": "Highlight 3 link",
+      "default": "/"
+    },
+    {
+      "type": "header",
+      "content": "Skin Care trending (mega menu)"
+    },
+    {
+      "type": "header",
+      "content": "Skin Care hero banners"
+    },
+    {
+      "type": "image_picker",
+      "id": "skin_hero_image_1",
+      "label": "Skin hero 1 image"
+    },
+    {
+      "type": "text",
+      "id": "skin_hero_title_1",
+      "label": "Skin hero 1 title",
+      "default": "Skin Care Highlight 1"
+    },
+    {
+      "type": "text",
+      "id": "skin_hero_subtitle_1",
+      "label": "Skin hero 1 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "skin_hero_link_1",
+      "label": "Skin hero 1 link",
+      "default": "/"
+    },
+    {
+      "type": "image_picker",
+      "id": "skin_hero_image_2",
+      "label": "Skin hero 2 image"
+    },
+    {
+      "type": "text",
+      "id": "skin_hero_title_2",
+      "label": "Skin hero 2 title",
+      "default": "Skin Care Highlight 2"
+    },
+    {
+      "type": "text",
+      "id": "skin_hero_subtitle_2",
+      "label": "Skin hero 2 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "skin_hero_link_2",
+      "label": "Skin hero 2 link",
+      "default": "/"
+    },
+    {
+      "type": "image_picker",
+      "id": "skin_hero_image_3",
+      "label": "Skin hero 3 image"
+    },
+    {
+      "type": "text",
+      "id": "skin_hero_title_3",
+      "label": "Skin hero 3 title",
+      "default": "Skin Care Highlight 3"
+    },
+    {
+      "type": "text",
+      "id": "skin_hero_subtitle_3",
+      "label": "Skin hero 3 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "skin_hero_link_3",
+      "label": "Skin hero 3 link",
+      "default": "/"
+    },
+    {
+      "type": "header",
+      "content": "Hair Care hero banners"
+    },
+    {
+      "type": "image_picker",
+      "id": "hair_hero_image_1",
+      "label": "Hair hero 1 image"
+    },
+    {
+      "type": "text",
+      "id": "hair_hero_title_1",
+      "label": "Hair hero 1 title",
+      "default": "Hair Care Highlight 1"
+    },
+    {
+      "type": "text",
+      "id": "hair_hero_subtitle_1",
+      "label": "Hair hero 1 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "hair_hero_link_1",
+      "label": "Hair hero 1 link",
+      "default": "/"
+    },
+    {
+      "type": "image_picker",
+      "id": "hair_hero_image_2",
+      "label": "Hair hero 2 image"
+    },
+    {
+      "type": "text",
+      "id": "hair_hero_title_2",
+      "label": "Hair hero 2 title",
+      "default": "Hair Care Highlight 2"
+    },
+    {
+      "type": "text",
+      "id": "hair_hero_subtitle_2",
+      "label": "Hair hero 2 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "hair_hero_link_2",
+      "label": "Hair hero 2 link",
+      "default": "/"
+    },
+    {
+      "type": "image_picker",
+      "id": "hair_hero_image_3",
+      "label": "Hair hero 3 image"
+    },
+    {
+      "type": "text",
+      "id": "hair_hero_title_3",
+      "label": "Hair hero 3 title",
+      "default": "Hair Care Highlight 3"
+    },
+    {
+      "type": "text",
+      "id": "hair_hero_subtitle_3",
+      "label": "Hair hero 3 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "hair_hero_link_3",
+      "label": "Hair hero 3 link",
+      "default": "/"
+    },
+    {
+      "type": "header",
+      "content": "Bath & Body hero banners"
+    },
+    {
+      "type": "image_picker",
+      "id": "bath_hero_image_1",
+      "label": "Bath hero 1 image"
+    },
+    {
+      "type": "text",
+      "id": "bath_hero_title_1",
+      "label": "Bath hero 1 title",
+      "default": "Bath & Body Highlight 1"
+    },
+    {
+      "type": "text",
+      "id": "bath_hero_subtitle_1",
+      "label": "Bath hero 1 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "bath_hero_link_1",
+      "label": "Bath hero 1 link",
+      "default": "/"
+    },
+    {
+      "type": "image_picker",
+      "id": "bath_hero_image_2",
+      "label": "Bath hero 2 image"
+    },
+    {
+      "type": "text",
+      "id": "bath_hero_title_2",
+      "label": "Bath hero 2 title",
+      "default": "Bath & Body Highlight 2"
+    },
+    {
+      "type": "text",
+      "id": "bath_hero_subtitle_2",
+      "label": "Bath hero 2 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "bath_hero_link_2",
+      "label": "Bath hero 2 link",
+      "default": "/"
+    },
+    {
+      "type": "image_picker",
+      "id": "bath_hero_image_3",
+      "label": "Bath hero 3 image"
+    },
+    {
+      "type": "text",
+      "id": "bath_hero_title_3",
+      "label": "Bath hero 3 title",
+      "default": "Bath & Body Highlight 3"
+    },
+    {
+      "type": "text",
+      "id": "bath_hero_subtitle_3",
+      "label": "Bath hero 3 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "bath_hero_link_3",
+      "label": "Bath hero 3 link",
+      "default": "/"
+    },
+    {
+      "type": "header",
+      "content": "Color Essentials hero banners"
+    },
+    {
+      "type": "image_picker",
+      "id": "color_hero_image_1",
+      "label": "Color hero 1 image"
+    },
+    {
+      "type": "text",
+      "id": "color_hero_title_1",
+      "label": "Color hero 1 title",
+      "default": "Color Highlight 1"
+    },
+    {
+      "type": "text",
+      "id": "color_hero_subtitle_1",
+      "label": "Color hero 1 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "color_hero_link_1",
+      "label": "Color hero 1 link",
+      "default": "/"
+    },
+    {
+      "type": "image_picker",
+      "id": "color_hero_image_2",
+      "label": "Color hero 2 image"
+    },
+    {
+      "type": "text",
+      "id": "color_hero_title_2",
+      "label": "Color hero 2 title",
+      "default": "Color Highlight 2"
+    },
+    {
+      "type": "text",
+      "id": "color_hero_subtitle_2",
+      "label": "Color hero 2 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "color_hero_link_2",
+      "label": "Color hero 2 link",
+      "default": "/"
+    },
+    {
+      "type": "image_picker",
+      "id": "color_hero_image_3",
+      "label": "Color hero 3 image"
+    },
+    {
+      "type": "text",
+      "id": "color_hero_title_3",
+      "label": "Color hero 3 title",
+      "default": "Color Highlight 3"
+    },
+    {
+      "type": "text",
+      "id": "color_hero_subtitle_3",
+      "label": "Color hero 3 subtitle",
+      "default": "Add caption"
+    },
+    {
+      "type": "url",
+      "id": "color_hero_link_3",
+      "label": "Color hero 3 link",
+      "default": "/"
+    },
+    {
+      "type": "text",
+      "id": "color_hero_heading",
+      "label": "Color hero text heading",
+      "default": "Customize this space"
+    },
+    {
+      "type": "text",
+      "id": "color_hero_subheading",
+      "label": "Color hero text subheading",
+      "default": "Add your featured color looks or promos here."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu_item",
+      "name": "Menu item",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label" },
+        { "type": "url", "id": "link", "label": "Link (URL)" }
+      ]
+    }
+  ],
+  "max_blocks": 20,
+  "presets": [
+    {
+      "name": "Custom Header",
+      "category": "Header"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,242 @@
+{%- unless request.page_type == 'product' -%}
+{%- style -%}
+  .promo-hero {
+    max-width: 1400px;
+    margin: 18px auto;
+    padding: 0 12px;
+  }
+
+  .promo-slider-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background-color: #f5f5f5;
+    aspect-ratio: 16 / 6;
+  }
+
+  .promo-slides {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.65s ease;
+    will-change: transform;
+  }
+
+  .promo-slide {
+    min-width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .promo-nav {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    gap: 8px;
+  }
+
+  .promo-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+
+  .promo-dot.active {
+    background: #111;
+    transform: scale(1.2);
+  }
+
+  .promo-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    background: rgba(255, 255, 255, 0.85);
+    border: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+
+  .promo-arrow:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .promo-arrow:focus-visible {
+    outline: 2px solid #111;
+    outline-offset: 2px;
+  }
+
+  .promo-arrow-prev {
+    left: 20px;
+  }
+
+  .promo-arrow-next {
+    right: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .promo-slider-wrap {
+      aspect-ratio: 4 / 3;
+    }
+
+    .promo-arrow {
+      width: 40px;
+      height: 40px;
+      left: auto;
+      right: auto;
+    }
+
+    .promo-arrow-prev {
+      left: 10px;
+    }
+
+    .promo-arrow-next {
+      right: 10px;
+    }
+  }
+{%- endstyle -%}
+
+<section class="promo-hero" aria-label="Promotional hero slider">
+  <div class="promo-slider-wrap">
+    <div class="promo-slides" id="promoSlides">
+      {%- assign has_custom_slides = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.settings.image != blank -%}
+          {%- assign has_custom_slides = true -%}
+          <div
+            class="promo-slide"
+            role="img"
+            aria-label="{%- if block.settings.aria_label != blank -%}{{ block.settings.aria_label | escape }}{%- else -%}Slide {{ forloop.index }}{%- endif -%}"
+            style="background-image: url('{{ block.settings.image | image_url: width: 2000 }}');"
+          ></div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- unless has_custom_slides -%}
+        <div
+          class="promo-slide"
+          role="img"
+          aria-label="Hero gradient slide"
+          style="background: linear-gradient(135deg, #f5e6d3 0%, #e8d5c4 100%);"
+        ></div>
+        <div
+          class="promo-slide"
+          role="img"
+          aria-label="Hero gradient slide"
+          style="background: linear-gradient(135deg, #d4e8f0 0%, #c5dfe8 100%);"
+        ></div>
+        <div
+          class="promo-slide"
+          role="img"
+          aria-label="Hero gradient slide"
+          style="background: linear-gradient(135deg, #dfe6f2 0%, #f3f5f9 100%);"
+        ></div>
+      {%- endunless -%}
+    </div>
+
+    <button class="promo-arrow promo-arrow-prev" aria-label="Previous slide" onclick="moveSlide(-1)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="promo-arrow promo-arrow-next" aria-label="Next slide" onclick="moveSlide(1)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <div class="promo-nav" id="promoNav"></div>
+  </div>
+</section>
+
+<script>
+  (function(){
+    var slidesContainer = document.getElementById('promoSlides');
+    var navContainer = document.getElementById('promoNav');
+    if (!slidesContainer || !navContainer) { return; }
+
+    var slides = Array.from(slidesContainer.querySelectorAll('.promo-slide'));
+    if (!slides.length) { return; }
+
+    var currentIndex = 0;
+    var dots = [];
+
+    slides.forEach(function(_, idx){
+      var dot = document.createElement('button');
+      dot.className = 'promo-dot' + (idx === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Go to slide ' + (idx + 1));
+      dot.onclick = function(){ goToSlide(idx); };
+      navContainer.appendChild(dot);
+      dots.push(dot);
+    });
+
+    function updateSlider(){
+      slidesContainer.style.transform = 'translateX(' + (-currentIndex * 100) + '%)';
+      dots.forEach(function(dot, idx){
+        dot.classList.toggle('active', idx === currentIndex);
+      });
+    }
+
+    function goToSlide(idx){
+      currentIndex = (idx + slides.length) % slides.length;
+      updateSlider();
+    }
+
+    window.moveSlide = function(direction){
+      if (slides.length <= 1) { return; }
+      currentIndex = (currentIndex + direction + slides.length) % slides.length;
+      updateSlider();
+    };
+
+    if (slides.length > 1) {
+      setInterval(function(){
+        window.moveSlide(1);
+      }, 5000);
+    }
+  })();
+</script>
+{%- endunless -%}
+
+{% schema %}
+{
+  "name": "Promo Hero Slider",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Slide image"
+        },
+        {
+          "type": "text",
+          "id": "aria_label",
+          "label": "Slide description (accessibility)",
+          "info": "This text is hidden visually but read by screen readers."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "Promo Hero Slider"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,358 @@
+{% liquid
+  assign section_heading = section.settings.heading | default: "We're on Gram"
+  assign bg_color = section.settings.background_color | default: "#0b5d3a"
+  assign autoplay_enabled = section.settings.autoplay
+  assign autoplay_speed = section.settings.slider_speed | default: 4500
+%}
+
+<section id="gram-{{ section.id }}" class="gram" style="background-color: {{ bg_color }};">
+  <div class="gram__inner">
+    <h2 class="gram__title">{{ section_heading }}</h2>
+
+    <div class="gram__slider" data-section-id="{{ section.id }}" data-autoplay="{{ autoplay_enabled }}" data-interval="{{ autoplay_speed }}">
+      <button class="gram__nav gram__nav--prev" type="button" aria-label="Previous" name="previous">
+        &#8592;
+      </button>
+      <ul class="gram__track" role="list">
+        {% liquid
+          assign min_cards = 12
+          assign total_blocks = section.blocks.size
+          assign extra_placeholders = 0
+          if total_blocks < min_cards
+            assign extra_placeholders = min_cards | minus: total_blocks
+          endif
+        %}
+        {% for block in section.blocks %}
+          {% liquid
+            assign image = block.settings.image
+            assign video_url = block.settings.video_url
+            assign link = block.settings.link
+        %}
+          {% if link != blank %}
+            <a href="{{ link }}" class="gram__card-link" {{ block.shopify_attributes }}>
+          {% else %}
+            <div class="gram__card-link" {{ block.shopify_attributes }}>
+          {% endif %}
+              <div class="gram__card">
+                <div class="gram__media">
+                  {% if video_url != blank %}
+                    <video class="gram__video" src="{{ video_url }}" playsinline muted loop controls preload="metadata"></video>
+                  {% elsif image != blank %}
+                    {{ image | image_url: width: 800 | image_tag: class: 'gram__image', loading: 'lazy', alt: section_heading }}
+                  {% else %}
+                    <div class="gram__placeholder" aria-hidden="true"></div>
+                  {% endif %}
+                </div>
+              </div>
+          {% if link != blank %}
+            </a>
+          {% else %}
+            </div>
+          {% endif %}
+        {% endfor %}
+        {% if extra_placeholders > 0 %}
+          {% for i in (1..extra_placeholders) %}
+            <div class="gram__card-link">
+              <div class="gram__card">
+                <div class="gram__media">
+                  <div class="gram__placeholder" aria-hidden="true"></div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </ul>
+      <button class="gram__nav gram__nav--next" type="button" aria-label="Next" name="next">
+        &#8594;
+      </button>
+    </div>
+
+    {% if section.settings.instagram_handle != blank or section.settings.instagram_url != blank %}
+      <div class="gram__footer">
+        <a class="gram__handle" href="{{ section.settings.instagram_url | default: '#' }}" target="_blank" rel="noopener">
+          {{ section.settings.instagram_handle | default: '@oshea_herbals' }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  #gram-{{ section.id }} {
+    color: #fff;
+  }
+
+  #gram-{{ section.id }} .gram__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 20px 40px;
+    text-align: center;
+  }
+
+  #gram-{{ section.id }} .gram__title {
+    margin: 0 0 28px;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  #gram-{{ section.id }} .gram__slider {
+    position: relative;
+  }
+
+  #gram-{{ section.id }} .gram__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 220px;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 4px 48px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  #gram-{{ section.id }} .gram__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  #gram-{{ section.id }} .gram__card-link {
+    display: block;
+    scroll-snap-align: start;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  #gram-{{ section.id }} .gram__card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 22px;
+    overflow: hidden;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  }
+
+  #gram-{{ section.id }} .gram__card:hover,
+  #gram-{{ section.id }} .gram__card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+    border-color: rgba(255, 255, 255, 0.28);
+    outline: none;
+  }
+
+  #gram-{{ section.id }} .gram__media {
+    position: relative;
+    width: 100%;
+    padding-top: 177.78%; /* 9:16 aspect ratio */
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  #gram-{{ section.id }} .gram__image,
+  #gram-{{ section.id }} .gram__video,
+  #gram-{{ section.id }} .gram__placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 22px;
+  }
+
+  #gram-{{ section.id }} .gram__video {
+    background: #000;
+  }
+
+  #gram-{{ section.id }} .gram__placeholder {
+    border: 2px dashed rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  #gram-{{ section.id }} .gram__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 150ms ease, border-color 150ms ease;
+  }
+
+  #gram-{{ section.id }} .gram__nav:hover,
+  #gram-{{ section.id }} .gram__nav:focus-visible {
+    background: rgba(255, 255, 255, 0.28);
+    border-color: rgba(255, 255, 255, 0.7);
+    outline: none;
+  }
+
+  #gram-{{ section.id }} .gram__nav--prev { left: 6px; }
+  #gram-{{ section.id }} .gram__nav--next { right: 6px; }
+
+  #gram-{{ section.id }} .gram__footer {
+    margin-top: 24px;
+  }
+
+  #gram-{{ section.id }} .gram__handle {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  #gram-{{ section.id }} .gram__handle:hover,
+  #gram-{{ section.id }} .gram__handle:focus-visible {
+    text-decoration: underline;
+    outline: none;
+  }
+
+  @media (max-width: 749px) {
+    #gram-{{ section.id }} .gram__track {
+      grid-auto-columns: 68%;
+      padding: 2px 42px;
+      gap: 12px;
+    }
+
+    #gram-{{ section.id }} .gram__title {
+      font-size: 1.6rem;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    const slider = document.querySelector('#gram-{{ section.id }} .gram__slider');
+    if (!slider) return;
+
+    const track = slider.querySelector('.gram__track');
+    const prevBtn = slider.querySelector('.gram__nav--prev');
+    const nextBtn = slider.querySelector('.gram__nav--next');
+    const autoplayEnabled = slider.dataset.autoplay === 'true';
+    const interval = parseInt(slider.dataset.interval, 10) || 4500;
+
+    const scrollByCard = () => {
+      const card = track.querySelector('.gram__card-link');
+      if (!card) return 0;
+      const style = getComputedStyle(card);
+      return card.getBoundingClientRect().width + parseFloat(style.marginLeft) + parseFloat(style.marginRight) + 16;
+    };
+
+    const scrollNext = () => {
+      track.scrollBy({ left: scrollByCard(), behavior: 'smooth' });
+    };
+
+    const scrollPrev = () => {
+      track.scrollBy({ left: -scrollByCard(), behavior: 'smooth' });
+    };
+
+    prevBtn?.addEventListener('click', scrollPrev);
+    nextBtn?.addEventListener('click', scrollNext);
+
+    let autoplayTimer;
+    const startAutoplay = () => {
+      if (!autoplayEnabled || autoplayTimer) return;
+      autoplayTimer = setInterval(scrollNext, interval);
+    };
+
+    const stopAutoplay = () => {
+      if (!autoplayTimer) return;
+      clearInterval(autoplayTimer);
+      autoplayTimer = null;
+    };
+
+    startAutoplay();
+    track.addEventListener('pointerdown', stopAutoplay, { passive: true });
+    track.addEventListener('touchstart', stopAutoplay, { passive: true });
+    slider.addEventListener('mouseenter', stopAutoplay);
+    slider.addEventListener('mouseleave', startAutoplay);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "We're on Gram",
+  "tag": "section",
+  "class": "section section--full-width",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "We're on Gram"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#0b5d3a"
+    },
+    {
+      "type": "text",
+      "id": "instagram_handle",
+      "label": "Instagram handle",
+      "default": "@oshea_herbals"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram profile URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable slider autoplay",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "slider_speed",
+      "label": "Slider speed",
+      "default": "4500",
+      "options": [
+        { "value": "3500", "label": "Fast" },
+        { "value": "4500", "label": "Normal" },
+        { "value": "6000", "label": "Slow" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "media_item",
+      "name": "Media",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "video_url",
+          "label": "Video URL (MP4 or hosted)"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (optional)"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "We're on Gram",
+      "blocks": [
+        { "type": "media_item" },
+        { "type": "media_item" },
+        { "type": "media_item" },
+        { "type": "media_item" },
+        { "type": "media_item" },
+        { "type": "media_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

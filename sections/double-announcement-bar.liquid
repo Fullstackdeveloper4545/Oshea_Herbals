@@ -1,0 +1,383 @@
+{%- style -%}
+  .double-announcement-bar {
+    width: 100%;
+  }
+
+  .announcement-bar {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .announcement-bar.bar-1 {
+    background-color: #008443;
+  }
+
+  .announcement-bar.bar-2 {
+    background-color: #B73221;
+  }
+
+  .announcement-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 1rem;
+    min-height: 60px;
+    color: white;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 749px) {
+    .announcement-content {
+      gap: 1rem;
+      padding: 0.875rem;
+      min-height: 50px;
+      font-size: 0.875rem;
+    }
+  }
+
+  .announcement-slider {
+    flex: 1;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .announcement-message {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
+
+  .announcement-message.active {
+    opacity: 1;
+  }
+
+  .announcement-arrow {
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .announcement-arrow:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+
+  .announcement-arrow:active {
+    transform: scale(0.95);
+  }
+
+  .announcement-arrow.left {
+    order: -1;
+  }
+
+  .announcement-arrow.right {
+    order: 1;
+  }
+
+  .announcement-indicator {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .announcement-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .announcement-dot.active {
+    background-color: white;
+  }
+
+  .bar-1 .announcement-indicator .announcement-dot.active {
+    background-color: white;
+  }
+
+  .bar-2 .announcement-indicator .announcement-dot.active {
+    background-color: white;
+  }
+
+  @media screen and (max-width: 749px) {
+    .announcement-indicator {
+      display: none;
+    }
+  }
+{%- endstyle -%}
+
+<div class="double-announcement-bar">
+  {%- if section.settings.enable_bar_1 -%}
+    <div class="announcement-bar bar-1" data-bar="1">
+      <div class="announcement-content">
+        <button class="announcement-arrow left" aria-label="Previous announcement" data-direction="prev">
+          ←
+        </button>
+        <div class="announcement-slider" id="slider-bar-1">
+          {%- for i in (1..3) -%}
+            {%- assign message_key = 'message_' | append: i -%}
+            {%- assign message = section.settings[message_key] -%}
+            <div class="announcement-message{% if i == 1 %} active{% endif %}" data-index="{{ i | minus: 1 }}">
+              {{ message }}
+            </div>
+          {%- endfor -%}
+        </div>
+        <button class="announcement-arrow right" aria-label="Next announcement" data-direction="next">
+          →
+        </button>
+      </div>
+      <div class="announcement-indicator" id="indicator-bar-1">
+        {%- for i in (1..3) -%}
+          <div class="announcement-dot{% if i == 1 %} active{% endif %}" data-index="{{ i | minus: 1 }}"></div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.enable_bar_2 -%}
+    <div class="announcement-bar bar-2" data-bar="2">
+      <div class="announcement-content">
+        <button class="announcement-arrow left" aria-label="Previous announcement" data-direction="prev">
+          ←
+        </button>
+        <div class="announcement-slider" id="slider-bar-2">
+          {%- for i in (1..3) -%}
+            {%- assign message_key = 'message_' | append: i | append: '_bar2' -%}
+            {%- assign message = section.settings[message_key] -%}
+            <div class="announcement-message{% if i == 1 %} active{% endif %}" data-index="{{ i | minus: 1 }}">
+              {{ message }}
+            </div>
+          {%- endfor -%}
+        </div>
+        <button class="announcement-arrow right" aria-label="Next announcement" data-direction="next">
+          →
+        </button>
+      </div>
+      <div class="announcement-indicator" id="indicator-bar-2">
+        {%- for i in (1..3) -%}
+          <div class="announcement-dot{% if i == 1 %} active{% endif %}" data-index="{{ i | minus: 1 }}"></div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+<script>
+  class AnnouncementBarManager {
+    constructor(barNumber) {
+      this.barNumber = barNumber;
+      this.currentIndex = 0;
+      this.autoSlideInterval = null;
+      this.container = document.querySelector(`[data-bar="${barNumber}"]`);
+      
+      if (!this.container) return;
+
+      this.slider = this.container.querySelector(`#slider-bar-${barNumber}`);
+      this.indicator = this.container.querySelector(`#indicator-bar-${barNumber}`);
+      this.messages = Array.from(this.slider.querySelectorAll('.announcement-message'));
+      this.totalMessages = this.messages.length;
+      this.autoSlideEnabled = {{ section.settings.auto_slide | default: true }};
+      this.slideSpeed = {{ section.settings.slide_speed | default: 5000 }};
+
+      this.init();
+    }
+
+    init() {
+      // Attach arrow button listeners
+      const buttons = this.container.querySelectorAll('.announcement-arrow');
+      buttons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          const direction = e.target.closest('.announcement-arrow').dataset.direction;
+          this.handleNavigation(direction);
+        });
+      });
+
+      // Attach indicator dot listeners
+      if (this.indicator) {
+        const dots = this.indicator.querySelectorAll('.announcement-dot');
+        dots.forEach((dot, index) => {
+          dot.addEventListener('click', () => {
+            this.goToSlide(index);
+          });
+        });
+      }
+
+      // Start auto-slide if enabled
+      if (this.autoSlideEnabled) {
+        this.startAutoSlide();
+      }
+
+      // Pause auto-slide on hover/focus
+      this.container.addEventListener('mouseenter', () => this.pauseAutoSlide());
+      this.container.addEventListener('mouseleave', () => {
+        if (this.autoSlideEnabled) this.startAutoSlide();
+      });
+    }
+
+    handleNavigation(direction) {
+      this.pauseAutoSlide();
+      if (direction === 'next') {
+        this.currentIndex = (this.currentIndex + 1) % this.totalMessages;
+      } else if (direction === 'prev') {
+        this.currentIndex = (this.currentIndex - 1 + this.totalMessages) % this.totalMessages;
+      }
+      this.updateSlide();
+      if (this.autoSlideEnabled) {
+        this.startAutoSlide();
+      }
+    }
+
+    goToSlide(index) {
+      this.pauseAutoSlide();
+      this.currentIndex = index;
+      this.updateSlide();
+      if (this.autoSlideEnabled) {
+        this.startAutoSlide();
+      }
+    }
+
+    updateSlide() {
+      // Update messages
+      this.messages.forEach((msg, index) => {
+        msg.classList.toggle('active', index === this.currentIndex);
+      });
+
+      // Update indicator dots
+      if (this.indicator) {
+        const dots = this.indicator.querySelectorAll('.announcement-dot');
+        dots.forEach((dot, index) => {
+          dot.classList.toggle('active', index === this.currentIndex);
+        });
+      }
+    }
+
+    startAutoSlide() {
+      if (this.autoSlideInterval) return;
+      this.autoSlideInterval = setInterval(() => {
+        this.currentIndex = (this.currentIndex + 1) % this.totalMessages;
+        this.updateSlide();
+      }, this.slideSpeed);
+    }
+
+    pauseAutoSlide() {
+      if (this.autoSlideInterval) {
+        clearInterval(this.autoSlideInterval);
+        this.autoSlideInterval = null;
+      }
+    }
+  }
+
+  // Initialize both announcement bars
+  document.addEventListener('DOMContentLoaded', () => {
+    new AnnouncementBarManager(1);
+    new AnnouncementBarManager(2);
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Double Announcement Bar",
+  "settings": [
+    {
+      "type": "header",
+      "content": "General Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_slide",
+      "label": "Enable auto-slide",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "slide_speed",
+      "min": 2000,
+      "max": 9000,
+      "step": 500,
+      "unit": "ms",
+      "label": "Slide speed",
+      "default": 5000
+    },
+    {
+      "type": "header",
+      "content": "Bar 1 (Green) - #008443"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_bar_1",
+      "label": "Enable Bar 1",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "message_1",
+      "label": "Announcement 1",
+      "default": "Flat 7% OFF on First Order + Additional 25 OFF on Pre-paid Orders"
+    },
+    {
+      "type": "text",
+      "id": "message_2",
+      "label": "Announcement 2",
+      "default": "Launch offer: Buy any 2 perfumes @ 1299"
+    },
+    {
+      "type": "text",
+      "id": "message_3",
+      "label": "Announcement 3",
+      "default": "Free shipping on orders above 499"
+    },
+    {
+      "type": "header",
+      "content": "Bar 2 (Red) - #B73221"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_bar_2",
+      "label": "Enable Bar 2",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "message_1_bar2",
+      "label": "Announcement 1",
+      "default": "Flat 30% OFF above 999"
+    },
+    {
+      "type": "text",
+      "id": "message_2_bar2",
+      "label": "Announcement 2",
+      "default": "Flat 15% OFF above 599"
+    },
+    {
+      "type": "text",
+      "id": "message_3_bar2",
+      "label": "Announcement 3",
+      "default": "Flat 20% OFF above 799"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Double Announcement Bar"
+    }
+  ]
+}
+{% endschema %}
